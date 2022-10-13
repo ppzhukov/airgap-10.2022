@@ -3,7 +3,7 @@
 Материалы к вебинару установки SUSE Rancher Airgap
 
 ```mermaid
-flowchart LR
+flowchart TB
 style id1 fill:#90EBCD
 style id2 fill:#30BA78
 style id3 fill:#30BA78
@@ -11,10 +11,9 @@ style id4 fill:#30BA78
 
   id1([Машина с доступом в интернет])
   id2(["Registry/Jump Host"])
-  id1 --> |Ручной перенос данных| id2
+  id1 -.Ручной перенос данных.-> id2
   id2 --> |Развертывание| d30
   subgraph d30 ["Выделенный сегмент сети"]
-    flowchart TB
     id3([SUSE Rancher Nodes])
     id4([RKE2 Nodes])
   end
