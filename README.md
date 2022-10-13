@@ -10,8 +10,8 @@ style id3 fill:#30BA78
 style id4 fill:#30BA78
 
   id1([Машина с доступом в интернет])
-  d1 --> |Ручной перенос данных| d2
   id2(["Registry/Jump Host"])
+  id1 -> |Ручной перенос данных| id2
   id2 --> |Развертывание| d30
   subgraph d30 ["Выделенный сегмент сети"]
     id3([SUSE Rancher Nodes])
