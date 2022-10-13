@@ -32,9 +32,10 @@ style d10 fill:#EEEEEE
 В нашем вебинаре мы будем ипользовать следующий стек продуктов и роли.
 1. Сервер с доступом в интенет на базе SUSE Linux Enterprise Server.
 2. Template для узлов в VMware vSphere (который мы создадим чуть позже), а также преднастроенные узлы и сетевой сегмент для развертывание.  
-3. Jump Host, с помощью которого будет производиться настройка узлов сети с использование Salt и на котором будет размещен Docker Registry также на этом сервере будет настроен [sslip.io](https://github.com/cunnie/sslip.io) для реализации простого DNS доступа.
-4. Три узела для развертывания Rancher (Будут настроенны с помощью Salt).
-5. Три узла для развертывания управляемого кластера (будут созданны Racnher, добавленны в управление Salt, донастроенны cloud-init).
+3. Jump Host, с помощью которого будет производиться настройка узлов сети с использование Salt и на котором будет размещен Docker Registry
+4  В вашей обособленной сети должна быть доступна служба DNS, если ее нет, Вы можете для тестов воспользоваться [sslip.io](https://github.com/cunnie/sslip.io) для реализации простого DNS доступа.
+6. Три узела для развертывания Rancher (Будут настроенны с помощью Salt).
+7. Три узла для развертывания управляемого кластера (будут созданны Racnher, добавленны в управление Salt, донастроенны cloud-init).
 
 ### Аппаратные требования
 - 1x Front Server
@@ -184,7 +185,7 @@ wget https://github.com/rancher/cli/releases/download/v2.6.8/rancher-linux-amd64
  docker pull registry:2
  docker save registry:2 |  gzip --stdout > registry.gz
 ```
-13. Скачайте каталог 
+13. Скачайте каталог  
 
 14. Сделайте копию всех полученных данных на внешний носитель, для копирования в сегмент без доступа в интернет:
 - rancher-load-images.sh
@@ -198,7 +199,7 @@ wget https://github.com/rancher/cli/releases/download/v2.6.8/rancher-linux-amd64
 - rancher-linux-amd64-v2.6.8.tar.gz
 - httpd.gz
 - registry.gz
-
+- ./salt
 
 ## Установка и настройка систем в изолированном контуре
 ### Подготовка
@@ -232,6 +233,10 @@ sudo mount SLE-15-SP4-Full-x86_64-GM-Media1.iso /media/suse/
 sudo kiwi-ng  --profile VMware system build --description ./kiwi-SLES-template/ --target-dir /tmp/out
 ```
 Сохраните получившейся файл __SLES15-SP4-Minimal-Rancher.x86_64-15.4.0.vmdk__
+10. Получившийся образ диска загрузить в хранилище VMware vSphere и использовать его для создание виртуальной машины используемой в дальнейшем как шаблон при развертывании.
+### Установка серверов SUSE Linux Enterprise для запуска SUSE Racnher
+1. Используйте получившийся образ для развертывания трех виртуальных машин для запуска SUSE Rancher.
+2. Настройте и запустите на нех службу salt minion
 
 
 
