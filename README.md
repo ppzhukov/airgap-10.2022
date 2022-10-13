@@ -124,6 +124,77 @@ chmod +x rancher-save-images.sh
 ```
 Результат: Docker начнет извлекаить (pulling) образы для установки с воздушным зазором. Будьте терпиливы. Этот процесс займет какое-то время. Когда процесс завершить будет сформирован файл __rancher-images.tar.gz__.
 
+7. Добавте репозиторий Rancher Helm Chart
+
+```bash
+helm repo add rancher-stable https://releases.rancher.com/server-charts/stable
+helm fetch rancher-stable/rancher --version=v2.6.8
+```
+
+8. Получите render шаблона cert-manager
+
+```bash
+export registry_url=192.168.0.10.sslip.io:5000
+helm template cert-manager ./cert-manager-v1.7.1.tgz --output-dir . \
+    --namespace cert-manager \
+    --set image.repository=${registry_url}/quay.io/jetstack/cert-manager-controller \
+    --set webhook.image.repository=${registry_url}/quay.io/jetstack/cert-manager-webhook \
+    --set cainjector.image.repository=${registry_url}/quay.io/jetstack/cert-manager-cainjector \
+    --set startupapicheck.image.repository=${registry_url}/quay.io/jetstack/cert-manager-ctl
+```
+9. Скачайте cert-manager CRD
+
+```bash
+curl -L -o cert-manager/cert-manager-crd.yaml https://github.com/jetstack/cert-manager/releases/download/v1.7.1/cert-manager.crds.yaml
+```
+
+10. Получите render шаблона Rancher
+Вы можете использовать как самоподписные, так и собственные сертификаты для установки Rancher, ниже пример для самоподписных сертификатов.
+Ниже в переменной __rancher_fqdn__ Вы должны указать FQDN для будущего сервера Rancher. А в переменной __registry_url__ URL вашего registry в безопасном сегменте (как например адрес и порт используемых в данной инструкции Jump Host, если у Вас нет готового registry)
+```bash
+export rancher_fqdn=192.168.0.11.sslip.io
+export registry_url=192.168.0.10.sslip.io:5000
+helm template rancher ./rancher-2.6.8.tgz --output-dir . \
+    --no-hooks \
+    --namespace cattle-system \
+    --set hostname=${rancher_fqdn} \
+    --set certmanager.version=1.7.1 \
+    --set rancherImage=${registry_url}/rancher/rancher \
+    --set systemDefaultRegistry=${registry_url} \
+    --set replicas=1 \
+    --set useBundledSystemChart=true \
+    --version=2.6.4
+```
+11. Загрузите утилиты CLI 
+```bash
+curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+wget https://github.com/rancher/rke2/releases/download/v1.25.5%2Brke2r1/rke2.linux-amd64.tar.gz
+wget https://github.com/rancher/cli/releases/download/v2.6.8/rancher-linux-amd64-v2.6.8.tar.gz
+```
+
+12. Получите образы registry
+```bash
+ docker pull httpd:2
+ docker save httpd:2 |  gzip --stdout > httpd.gz
+ docker pull registry:2
+ docker save registry:2 |  gzip --stdout > registry.gz
+```
+
+13. Сделайте копию всех полученных данных на внешний носитель, для копирования в сегмент без доступа в интернет:
+- rancher-load-images.sh
+- rancher-images.tar.gz
+- rancher-images.txt
+- ./rancher
+- ./cert-manager
+- kubectl CLI
+- kubectl-minio CLI
+- rke2.linux-amd64.tar.gz
+- rancher-linux-amd64-v2.6.8.tar.gz
+- httpd.gz
+- registry.gz
+
+## Установка и настройка систем в изолированном контуре
+
 
 
 [Файлы материалов](https://github.com/ppzhukov/airgap-10.2022/)
