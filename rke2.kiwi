@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- OBS-Profiles: @BUILD_FLAVOR@ -->
+<!-- OBS-Milestone: %current_milestone -->
+
+<image schemaversion="6.1" name="SLES15-SP4-Minimal-RKE2" displayname="SLES 15 SP4">
+    <description type="system">
+        <author>SUSE CIS</author>
+        <contact>Pavel.Zhukov@suse.com</contact>
+        <specification>SUSE Linux Enterprise 15 SP4 Minimal</specification>
+    </description>
+    <profiles>
+        <profile name="VMware" description="Minimal for VMware" arch="x86_64"/>
+    </profiles>
+    <preferences profiles="VMware">
+        <version>15.4.0</version>
+        <packagemanager>zypper</packagemanager>
+        <bootsplash-theme>SLE</bootsplash-theme>
+        <bootloader-theme>SLE</bootloader-theme>
+    <!-- those settings are applied by suseConfig in config.sh -->
+        <locale>en_US</locale>
+        <keytable>us.map.gz</keytable>
+        <timezone>Europe/Moscow</timezone>
+        <hwclock>utc</hwclock>
+    <!-- END those settings are applied by suseConfig in config.sh -->
+     
+        <rpm-excludedocs>true</rpm-excludedocs>
+        <type
+            image="vmx"
+            filesystem="btrfs"
+            format="vmdk"
+            bootloader="grub2"
+            firmware="uefi"
+            efipartsize="33"
+            kernelcmdline="rw systemd.show_status=1 console=ttyS0,115200 console=tty0 quiet"
+            bootpartition="false"
+            bootkernel="custom"
+            devicepersistency="by-uuid"
+            btrfs_quota_groups="true"
+            btrfs_root_is_snapshot="true"
+            bundle_format="%N-VM.%A-%I"
+        >
+            <systemdisk>
+                <volume name="home"/>
+                <volume name="root"/>
+                <volume name="tmp"/>
+                <volume name="opt"/>
+                <volume name="srv"/>
+                <volume name="boot/grub2/i386-pc"/>
+                <volume name="boot/grub2/x86_64-efi" mountpoint="boot/grub2/x86_64-efi"/>
+                <volume name="usr/local"/>
+                <volume name="var" copy_on_write="false"/>
+            </systemdisk>
+            <size unit="G">24</size>
+            <machine memory="1024" HWversion="10" guestOS="sles-64"/>
+        </type>
+    </preferences>
+
+    <repository alias="DVD-1-Product-SLES">
+        <source path="file:///media/suse/Product-SLES"/>
+    </repository>
+    <repository alias="DVD-1-Module-Basesystem">
+        <source path="file:///media/suse/Module-Basesystem"/>
+    </repository>
+    <repository alias="DVD-1-Module-Public-Cloud">
+        <source path="file:///media/suse/Module-Public-Cloud"/>
+    </repository>
+    <repository alias="DVD-1-Module-Development-Tools">
+        <source path="file:///media/suse/Module-Development-Tools"/>
+    </repository>
+    <repository alias="DVD-1-Module-Server-Applications">
+        <source path="file:///media/suse/Module-Server-Applications"/>
+    </repository>
+
+    <packages type="image">
+        <package name="patterns-base-base"/>
+        <package name="patterns-base-apparmor"/> <!-- Installs tools and profiles -->
+        <package name="audit"/> <!-- On SLE it's only recommended by the apparmor pattern -->
+        <package name="aaa_base-extras"/> <!-- wouldn't be SUSE without that ;-) -->
+        <package name="acl"/>
+        <package name="chrony"/>
+        <package name="curl"/> <!-- needed for openQA, maybe delete -->
+        <package name="dracut"/>
+        <package name="fipscheck"/>
+        <package name="group(mail)"/> <!-- needed by useradd bsc#1061838-->
+        <package name="group(wheel)"/>
+        <package name="grub2-branding-SLE" bootinclude="true"/>
+        <package name="iputils"/>
+        <package name="issue-generator"/> <!-- bsc#1084879 -->
+        <package name="zypper-lifecycle-plugin"/> <!-- bsc#1030278 fate#320597 -->
+        <package name="vim"/>
+        <package name="grub2"/>
+        <package name="grub2-x86_64-efi" arch="x86_64"/>
+        <package name="grub2-arm64-efi" arch="aarch64"/>
+        <package name="haveged"/>
+        <package name="less" />
+        <package name="tar"/>
+        <package name="parted"/>
+        <package name="SUSEConnect"/>
+        <package name="suse-build-key"/>
+        <package name="systemd"/>
+        <package name="systemd-sysvinit"/>
+        <package name="timezone"/>
+        <package name="wicked"/>
+        <package name="iproute2"/> 
+        <package name="openssh"/>
+        <package name="rsync"/>
+        <package name="salt-minion"/>
+        <package name="dosfstools"/> <!-- For fscking /boot/efi -->
+        <package name="lsof"/> <!-- For zypper ps (bsc#1167553) -->
+        <package name="jeos-licenses"/>
+
+        <package name="rsyslog"/> <!-- For SLE -->
+        <!-- <package name="systemd-logger"/> for openSUSE -->
+        <package name="zypper-needs-restarting"/> <!-- Some deployment script use this (bsc#1173548) -->
+    </packages>
+
+    <packages type="image" profiles="VMware">
+        <!-- Only for btrfs -->
+        <package name="btrfsprogs"/>
+        <package name="btrfsmaintenance"/>
+        <package name="grub2-snapper-plugin"/>  <!-- snapper - grub2 - integration, "small" -->
+        <package name="snapper-zypp-plugin"/>   <!-- this is key snapper/zypp integration, as requested in the PRD -->
+        <package name="rollback-helper"/>
+        <package name="snapper"/>
+
+        <package name="firewalld"/>
+    <!-- Shim for secure boot everywhere except for RPi -->
+        <package name="shim" arch="aarch64,x86_64"/>
+
+        <package name="open-vm-tools" arch="x86_64"/>
+        <package name="kernel-default-base"/>
+
+        <package name="cloud-init" />
+        <package name="cloud-init-config-suse" />
+        <package name="clone-master-clean-up" />
+    <!--ZIP for Terraform archive provider-->
+        <package name="zip" />
+        <package name="unzip" />
+  
+    </packages>
+
+    <packages type="bootstrap">
+        <package name="filesystem"/>
+        <package name="glibc-locale-base"/>
+        <package name="ca-certificates-mozilla"/>
+        <package name="sles-release"/>
+    </packages>
+</image>
