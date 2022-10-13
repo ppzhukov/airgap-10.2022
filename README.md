@@ -24,7 +24,9 @@ style d10 fill:#EEEEEE
     id2 --> |Развертывание| d30
     subgraph d30 [" "]
       id3([SUSE Rancher Nodes])
+      1 2 3
       id4([RKE2 Nodes])
+      1 2 3
     end
   end
 ```
