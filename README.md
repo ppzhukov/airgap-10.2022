@@ -37,13 +37,18 @@ style d10 fill:#EEEEEE
 5. Три узла для развертывания управляемого кластера (будут созданны Racnher, добавленны в управление Salt, донастроенны cloud-init).
 
 ### Аппаратные требования
+- 1x Front Server
+  4 vCPU
+  16 GiB RAM
+  1 x HDD 300GB 
+
 - 1x Jump Host
   4 vCPU
   16 GiB RAM
-  1 x HDD +300GB (для registry)
+  1 x HDD 300GB (для registry)
   Поскольку мы совместили роли, нам понадобиться больше места: хранить копию данных образов для загрузки, копию данных образов в Docker, копию данных образов в Registry.
 
-- 1x dedicate server for Rancher
+- 3x dedicate server for Rancher
   4 vCPU
   16 GiB RAM
   1 x HDD - > 100 GB
@@ -79,10 +84,10 @@ chown root:docker /var/run/docker.sock
 ```bash
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 ```
-3. Найдите и загрузите файлы требуемой версии Rancher
+3. Найдите и скачайте файлы требуемой версии Rancher
 Перейдите страницу с данными [releases](https://github.com/rancher/rancher/releases) и найдите релиз v2.x.x версии которой хотите установить и нажмите Assets. Примечание. Не используйте выпуски с пометкой *rc* или *Pre-release*, так как они нестабильны и не для производственной среды.
 
-Загрузите из секции Assets следующие файлы (они тербуются для установки в окружение с воздушным зазором):
+Скачайте из секции Assets следующие файлы (они тербуются для установки в окружение с воздушным зазором):
 - __rancher-images.txt__  Этот файл содержит список образов требуемых для установки Rancher, развертывания коастера и использования инструментов (tools) Rancher.
 - __rancher-save-images.sh__	Этот скрипт скачает (pulls) все образы из rancher-images.txt с Docker Hub и сохранит их как rancher-images.tar.gz
 - __rancher-load-images.sh__	Этот скрипт загрузит (loads) образы из rancher-images.tar.gz и выгрузит (pushes) в частное (private) registry.
@@ -102,7 +107,7 @@ sort -u rancher-images.txt -o rancher-images.txt
 ```
 5. Получите список образов RKE2
   1. Перейдите на страницу [releases page](https://github.com/rancher/rke2/releases), Найдите RKE2 release который планируете установить и нажмите Assets.
-В секции Assets загрузите следующий файл со списком образов требуемых для установки RKE2 в инфраструктуре с воздушным зазором:
+В секции Assets скачайте следующий файл со списком образов требуемых для установки RKE2 в инфраструктуре с воздушным зазором:
  __rke2-images-all.linux-amd64.txt__
 
   2. Добавте образы RKE2 к файлу __rancher-images.txt__:
@@ -165,7 +170,7 @@ helm template rancher ./rancher-2.6.8.tgz --output-dir . \
     --set useBundledSystemChart=true \
     --version=2.6.4
 ```
-11. Загрузите утилиты CLI 
+11. Скачайте утилиты CLI 
 ```bash
 curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
 wget https://github.com/rancher/rke2/releases/download/v1.25.5%2Brke2r1/rke2.linux-amd64.tar.gz
@@ -179,8 +184,9 @@ wget https://github.com/rancher/cli/releases/download/v2.6.8/rancher-linux-amd64
  docker pull registry:2
  docker save registry:2 |  gzip --stdout > registry.gz
 ```
+13. Скачайте каталог 
 
-13. Сделайте копию всех полученных данных на внешний носитель, для копирования в сегмент без доступа в интернет:
+14. Сделайте копию всех полученных данных на внешний носитель, для копирования в сегмент без доступа в интернет:
 - rancher-load-images.sh
 - rancher-images.tar.gz
 - rancher-images.txt
@@ -193,7 +199,55 @@ wget https://github.com/rancher/cli/releases/download/v2.6.8/rancher-linux-amd64
 - httpd.gz
 - registry.gz
 
+
 ## Установка и настройка систем в изолированном контуре
+### Подготовка
+- Скачайте установочный образ SUSE Linux Enterprise Server 15 SP4 (full ISO)
+- Установите на Jump Host SUSE Linux Enterprise Server
+### Создания образа SLES для VMware vSphere
+1. На Jump Host установите пакет kiwi.
+```bash
+sudo zypper install -y python3-kiwi
+```
+2. Запустите комманду ниже для создания пароля пользователя root для образа
+```bash
+openssl passwd -1 -salt 'suse' suse1234
+```
+3. Копируйте каталог с настройками образа.
+```bash
+```
+4. Скачайте и замените в каталоге скаченным файл [config.sh](config.sh)
+5. Скачайте, замените скаченным и измените пароль в готовом шаблоне [Minimal.kiwi](Minimal.kiwi)
+6. Скачайте SUSE Linux Enterprise Server 15SP4 (full iso) SLE-15-SP4-Full-x86_64-GM-Media1.iso
+7. Создайте каталог __/media/suse__
+```bash
+sudo mkdir -p /media/suse
+```
+8. Подключите iso к каталогу.
+```bash
+sudo mount SLE-15-SP4-Full-x86_64-GM-Media1.iso /media/suse/
+```
+9. Запустите следующую команду, что-бы создать образ:
+```bash
+sudo kiwi-ng  --profile VMware system build --description ./kiwi-SLES-template/ --target-dir /tmp/out
+```
+Сохраните получившейся файл __SLES15-SP4-Minimal-Rancher.x86_64-15.4.0.vmdk__
+### Установка и настройка Terraform
+1. Установка Terraform на Jump Host
+Вы можете скачать terraform с [зеркала](https://hashicorp-releases.yandexcloud.net/terraform/) компании Yandex. Используйте последнюю стабильную версию, на момент написания v1.3.2
+После поместите исполняемый файл с один из специальных каталогов для иполняемых файлов (например __~/bin__) или добавть путь до него в переменную __PATH__.
+Добавьте в файл [~/.terraformrc](.terraformrc) информацию о зеркале для провайдеров Terraform.
+2. 
+
+
+
+
+7. Run below command to copy image to ../tf/template/files/
+```bash
+cp /tmp/out/SLES15-SP4-Minimal-Rancher.x86_64-15.4.0.vmdk ./tf/template/files/
+```
+
+
 
 
 
