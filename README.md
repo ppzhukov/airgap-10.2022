@@ -8,7 +8,7 @@ style id1 fill:#90EBCD
 style id2 fill:#30BA78
 style id3 fill:#30BA78
 style id4 fill:#30BA78
-style d10 fill:#AAAAAA
+style d10 fill:#BBBBBB
 
   id1([Машина с доступом в интернет])
   id1 -.Ручной перенос данных.-> id2  
