@@ -204,7 +204,7 @@ wget https://github.com/rancher/cli/releases/download/v2.6.8/rancher-linux-amd64
 ## Установка и настройка систем в изолированном контуре
 ### Подготовка
 - Скачайте установочный образ SUSE Linux Enterprise Server 15 SP4 (full ISO)
-- Установите на Jump Host SUSE Linux Enterprise Server
+- Установите на Jump Host SUSE Linux Enterprise Server (оставьте подключенным к нему iso образ)
 ### Создания образа SLES для VMware vSphere
 1. На Jump Host установите пакет kiwi.
 ```bash
@@ -234,12 +234,39 @@ sudo kiwi-ng  --profile VMware system build --description ./kiwi-SLES-template/ 
 ```
 Сохраните получившейся файл __SLES15-SP4-Minimal-Rancher.x86_64-15.4.0.vmdk__
 10. Получившийся образ диска загрузить в хранилище VMware vSphere и использовать его для создание виртуальной машины используемой в дальнейшем как шаблон при развертывании.
+### Настройка Salt Master на Jump Host
+1. Установите пакет salt-master
+```
+
+```
+2. Скопируйте с внешнего носителя следующие файлы и папки:
+-  папку ./salt/srv/reactor/ в /srv/
+-  папку ./salt/srv/salt в /srv/
+-  файл ./salt/etc/salt/master.d/master.conf в /etc/salt/master.d/
+-  файл ./salt/etc/salt/autosign_grains/autosign_key в /etc/salt/autosign_grains/
+-  файл ./salt/etc/salt/minion.d/minion.conf в /etc/salt/minion.d/
+-  файл ./salt/etc/salt/minion.d/autosign-grains.conf в /etc/salt/minion.d/
+salt-call --local state.apply
+
+
 ### Установка серверов SUSE Linux Enterprise для запуска SUSE Racnher
 1. Используйте получившийся образ для развертывания трех виртуальных машин для запуска SUSE Rancher.
 2. Настройте и запустите на нех службу salt minion
-
-
-
+Создать файл __/etc/salt/minion.d/minion.conf__ со следющим содержанием (заменив IP адрес мастера адресом Jump Host)
+```
+master: 192.168.14.10
+MINION_ID_REMOVE_DOMAIN: true
+grains:
+  roles: stend
+```
+Создать файл __/etc/salt/minion.d/autosign-grains.conf__ (если Вы измените autosign_key, замените его в настройках мастера также)
+```
+grains:
+  autosign_key: 39ee688c
+autosign_grains:
+  - autosign_key
+```
+systemctl enable salt-minion --now
 
 
 
