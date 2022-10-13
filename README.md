@@ -31,9 +31,9 @@ style d10 fill:#EEEEEE
 В тестовом варианте мы можем совместить ряд ролей (Например Registry и Jump Host, роли серверов Kubernetes)
 В нашем вебинаре мы будем ипользовать следующий стек продуктов и роли.
 1. Сервер с доступом в интенет на базе SUSE Linux Enterprise Server.
-2. Конфигурационные файлы Terraform, которые создадут нам Template для узлов в VMware vSphere, а также преднастроенные узлы и сетевой сегмент для развертывание.  
+2. Template для узлов в VMware vSphere (который мы создадим чуть позже), а также преднастроенные узлы и сетевой сегмент для развертывание.  
 3. Jump Host, с помощью которого будет производиться настройка узлов сети с использование Salt и на котором будет размещен Docker Registry также на этом сервере будет настроен [sslip.io](https://github.com/cunnie/sslip.io) для реализации простого DNS доступа.
-4. Один узел для развертывания Rancher (Будет создан Terrafor и настроенны с помощью Salt).
+4. Три узела для развертывания Rancher (Будут настроенны с помощью Salt).
 5. Три узла для развертывания управляемого кластера (будут созданны Racnher, добавленны в управление Salt, донастроенны cloud-init).
 
 ### Аппаратные требования
@@ -232,20 +232,7 @@ sudo mount SLE-15-SP4-Full-x86_64-GM-Media1.iso /media/suse/
 sudo kiwi-ng  --profile VMware system build --description ./kiwi-SLES-template/ --target-dir /tmp/out
 ```
 Сохраните получившейся файл __SLES15-SP4-Minimal-Rancher.x86_64-15.4.0.vmdk__
-### Установка и настройка Terraform
-1. Установка Terraform на Jump Host
-Вы можете скачать terraform с [зеркала](https://hashicorp-releases.yandexcloud.net/terraform/) компании Yandex. Используйте последнюю стабильную версию, на момент написания v1.3.2
-После поместите исполняемый файл с один из специальных каталогов для иполняемых файлов (например __~/bin__) или добавть путь до него в переменную __PATH__.
-Добавьте в файл [~/.terraformrc](.terraformrc) информацию о зеркале для провайдеров Terraform.
-2. 
 
-
-
-
-7. Run below command to copy image to ../tf/template/files/
-```bash
-cp /tmp/out/SLES15-SP4-Minimal-Rancher.x86_64-15.4.0.vmdk ./tf/template/files/
-```
 
 
 
