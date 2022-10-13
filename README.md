@@ -22,7 +22,7 @@ style d10 fill:#EEEEEE
   subgraph d10 ["Сеть без доступа в интернет"]
     id2(["Registry/Jump Host"])
     id2 --> |Развертывание| d30
-    subgraph d30 ["Выделенный сегмент сети"]
+    subgraph d30
       id3([SUSE Rancher Nodes])
       id4([RKE2 Nodes])
     end
