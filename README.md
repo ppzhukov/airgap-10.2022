@@ -3,7 +3,7 @@
 Материалы к вебинару установки SUSE Rancher Airgap
 
 ```mermaid
-flowchart TB
+flowchart LR
 style id1 fill:#90EBCD
 style id2 fill:#30BA78
 style id3 fill:#30BA78
