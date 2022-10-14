@@ -79,21 +79,21 @@ style d10 fill:#EEEEEE
 1. Установить и запустить Docker
   - Если у Вас есть клоюч активации и система активирована выполните следующую команду:
 ```bash
-SUSEConnect -p sle-module-containers/15.3/x86_64
+sudo SUSEConnect -p sle-module-containers/15.3/x86_64
 ```
 Или
   - Если Вы установили SLES с DVD без подключения источников обновления и дополнительных модулей, то оставьте DVD в приводе (Важно, Вам нужен full ISO):
 ```bash
-yast2 add-on
+sudo yast2 add-on
 ```
   Выберите Add => DVD => Подключите DVD образ => Отметьте "Containers Module" => Next => Accept => OK => Finish => OK
  
 Для установки docker выполните:
 ```bash
-zypper in -y docker
-usermod -aG docker sles
-usermod -aG docker root
-chown root:docker /var/run/docker.sock
+sudo zypper in -y docker
+sudo usermod -aG docker sles
+sudo usermod -aG docker root
+sudo chown root:docker /var/run/docker.sock
 ```
 2. Установка CLI helm
 ```bash
