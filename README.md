@@ -33,10 +33,10 @@ style d10 fill:#EEEEEE
 1. Сервер с доступом в интенет на базе SUSE Linux Enterprise Server.
 2. Данный пример использует в качестве среды виртуализации VMware vSphere, но Вы можете использовать любую другую, создав необходимый шаблон виртуальной машины и подключив нужные модули в Rancher, если требуется его интеграция.
 3. Template для узлов в VMware vSphere (который мы создадим чуть позже), а также преднастроенные узлы и сетевой сегмент для развертывание.  
-4. Jump Host, с помощью которого будет производиться настройка узлов сети с использование Salt и на котором будет размещен Docker Registry
+4. Jump Host, с помощью которого будет производиться настройка узлов сети и на котором будет размещен Docker Registry
 5.  В вашей обособленной сети должна быть доступна служба DNS, если ее нет, Вы можете для тестов воспользоваться [sslip.io](https://github.com/cunnie/sslip.io) для реализации простого DNS доступа.
-6. Три узела для развертывания Rancher (Будут настроенны с помощью Salt).
-7. Три узла для развертывания управляемого кластера (будут созданны Racnher, добавленны в управление Salt, донастроенны cloud-init).
+6. Три узела для развертывания Rancher.
+7. Три узла для развертывания управляемого кластера (будут созданны Racnher, донастроенны cloud-init).
 
 ### Аппаратные требования
 - 1x Front Server
@@ -199,9 +199,7 @@ wget https://github.com/rancher/cli/releases/download/v2.6.8/rancher-linux-amd64
  docker pull registry:2
  docker save registry:2 |  gzip --stdout > registry.gz
 ```
-13. Скачайте каталог  
-
-14. Сделайте копию всех полученных данных на внешний носитель, для копирования в сегмент без доступа в интернет:
+13. Сделайте копию всех полученных данных на внешний носитель, для копирования в сегмент без доступа в интернет:
 - rancher-load-images.sh
 - rancher-images.tar.gz
 - rancher-images.txt
@@ -213,7 +211,6 @@ wget https://github.com/rancher/cli/releases/download/v2.6.8/rancher-linux-amd64
 - rancher-linux-amd64-v2.6.8.tar.gz
 - httpd.gz
 - registry.gz
-- ./salt
 
 ## Установка и настройка систем в изолированном контуре
 ### Подготовка
@@ -223,7 +220,6 @@ wget https://github.com/rancher/cli/releases/download/v2.6.8/rancher-linux-amd64
   - Containers Module
   - Server Applications Module
 Перечисленные ниже комманды исходят из того, что у Вас нет доступа к службе SUSE RMT (централизованного обновления) внутри изолированного сегдмента. Если у Вас есть служба RMT, просто замените команды подключения репозиториев аналогичиными с использованием SUSEConnect. Централизванное обновление выходит за рамки данного вебинара, но наличие этой службы во многом упростит работы.
-Salt используется для первоначальной настройки серверов Вы можете отказаться от его использования инастроить службы вручную:
 - 
 ### Создания образа SLES для VMware vSphere
 1. На Jump Host установите пакет kiwi.
@@ -269,49 +265,31 @@ usermod -aG docker sles
 usermod -aG docker root
 chown root:docker /var/run/docker.sock
 ```
-### Настройка Salt Master на Jump Host
-1. Если Вы установили SLES с DVD без подключения источников обновления и дополнительных модулей, то оставьте DVD в приводе (Важно, Вам нужен full ISO):
-```bash
-yast2 add-on
-```
-  Выберите Add => DVD => Подключите DVD образ => Отметьте "Server Applications Module" => Next => Accept => OK => Finish => OK
-
-2. Установите пакет salt-master
-```
-zypper in -y salt-master
-```
-3. Скопируйте с внешнего носителя следующие файлы и папки:
--  папку ./salt/srv/reactor/ в /srv/
--  папку ./salt/srv/salt в /srv/
--  файл ./salt/etc/salt/master.d/master.conf в /etc/salt/master.d/
--  файл ./salt/etc/salt/autosign_grains/autosign_key в /etc/salt/autosign_grains/
--  файл ./salt/etc/salt/minion.d/minion.conf в /etc/salt/minion.d/
--  файл ./salt/etc/salt/minion.d/autosign-grains.conf в /etc/salt/minion.d/
-
-```bash
-salt-call --local state.apply
-```
-
-### Установка серверов SUSE Linux Enterprise для запуска SUSE Racnher
-1. Используйте получившийся образ для развертывания трех виртуальных машин для запуска SUSE Rancher.
-2. Настройте и запустите на нех службу salt minion
-Создать файл __/etc/salt/minion.d/minion.conf__ со следющим содержанием (заменив IP адрес мастера адресом Jump Host)
-```
-master: 192.168.14.10
-MINION_ID_REMOVE_DOMAIN: true
-grains:
-  roles: stend
-```
-Создать файл __/etc/salt/minion.d/autosign-grains.conf__ (если Вы измените autosign_key, замените его в настройках мастера также)
-```
-grains:
-  autosign_key: 39ee688c
-autosign_grains:
-  - autosign_key
-```
-systemctl enable salt-minion --now
 
 
+chronyd:
+  service.running:
+    - enable: True
+    - watch:
+      - pkg: chrony
+      - file: /etc/chrony.d/ntp.conf
+    - require:
+      - pkg: chrony
+      - file: /etc/chrony.d/ntp.conf
+
+longhorn-install:
+  pkg.installed:
+    - names:
+      - open-iscsi
+      - nfs-kernel-server
+    - require:
+        - sls: registration
+
+nfs-server:
+  service.running:
+    - enable: True
+    - require:
+      - longhorn-install
 
 [Файлы материалов](https://github.com/ppzhukov/airgap-10.2022/)
 
