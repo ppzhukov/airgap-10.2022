@@ -31,9 +31,10 @@ style d10 fill:#EEEEEE
 В тестовом варианте мы можем совместить ряд ролей (Например Registry и Jump Host, роли серверов Kubernetes)
 В нашем вебинаре мы будем ипользовать следующий стек продуктов и роли.
 1. Сервер с доступом в интенет на базе SUSE Linux Enterprise Server.
-2. Template для узлов в VMware vSphere (который мы создадим чуть позже), а также преднастроенные узлы и сетевой сегмент для развертывание.  
-3. Jump Host, с помощью которого будет производиться настройка узлов сети с использование Salt и на котором будет размещен Docker Registry
-4  В вашей обособленной сети должна быть доступна служба DNS, если ее нет, Вы можете для тестов воспользоваться [sslip.io](https://github.com/cunnie/sslip.io) для реализации простого DNS доступа.
+2. Данный пример использует в качестве среды виртуализации VMware vSphere, но Вы можете использовать любую другую, создав необходимый шаблон виртуальной машины и подключив нужные модули в Rancher, если требуется его интеграция.
+3. Template для узлов в VMware vSphere (который мы создадим чуть позже), а также преднастроенные узлы и сетевой сегмент для развертывание.  
+4. Jump Host, с помощью которого будет производиться настройка узлов сети с использование Salt и на котором будет размещен Docker Registry
+5.  В вашей обособленной сети должна быть доступна служба DNS, если ее нет, Вы можете для тестов воспользоваться [sslip.io](https://github.com/cunnie/sslip.io) для реализации простого DNS доступа.
 6. Три узела для развертывания Rancher (Будут настроенны с помощью Salt).
 7. Три узла для развертывания управляемого кластера (будут созданны Racnher, добавленны в управление Salt, донастроенны cloud-init).
 
@@ -72,10 +73,23 @@ style d10 fill:#EEEEEE
 На данном сервере Вам потребуется Linux с установленным Docker. Я рекомендую установить SUSE Linux Enterprise Server в базовой конфигурации (Это может быть вариант Minimal для которого можно использовать следующую [инструкцию](front_server-install_script.md), но потребуется действующая подписка (ключ активации) для онлайн установки ряда пакетов).
 Вы можете установить все обновления SUSE Linux Enterprise Server, для этого Вам потребуется ключ активации, возможно также использование триального ключа.
 Вы также можете использовать OpenSUSE заменив ряд команд.
-И так, если Вы установили SUSE Linux Enterprise Server, Вам потребуется сделать следющее:
+И так, если Вы решили использовать SUSE Linux Enterprise Server, при установке добавте следующие модули:
+  - Containers Module
+  - Server Applications Module
 1. Установить и запустить Docker
+  - Если у Вас есть клоюч активации и система активирована выполните следующую команду:
 ```bash
 SUSEConnect -p sle-module-containers/15.3/x86_64
+```
+Или
+  - Если Вы установили SLES с DVD без подключения источников обновления и дополнительных модулей, то оставьте DVD в приводе (Важно, Вам нужен full ISO):
+```bash
+yast2 add-on
+```
+  Выберите Add => DVD => Подключите DVD образ => Отметьте "Containers Module" => Next => Accept => OK => Finish => OK
+ 
+Для установки docker выполните:
+```bash
 zypper in -y docker
 usermod -aG docker sles
 usermod -aG docker root
@@ -205,6 +219,12 @@ wget https://github.com/rancher/cli/releases/download/v2.6.8/rancher-linux-amd64
 ### Подготовка
 - Скачайте установочный образ SUSE Linux Enterprise Server 15 SP4 (full ISO)
 - Установите на Jump Host SUSE Linux Enterprise Server (оставьте подключенным к нему iso образ)
+- При установке добавте следующие модули:
+  - Containers Module
+  - Server Applications Module
+Перечисленные ниже комманды исходят из того, что у Вас нет доступа к службе SUSE RMT (централизованного обновления) внутри изолированного сегдмента. Если у Вас есть служба RMT, просто замените команды подключения репозиториев аналогичиными с использованием SUSEConnect. Централизванное обновление выходит за рамки данного вебинара, но наличие этой службы во многом упростит работы.
+Salt используется для первоначальной настройки серверов Вы можете отказаться от его использования инастроить службы вручную:
+- 
 ### Создания образа SLES для VMware vSphere
 1. На Jump Host установите пакет kiwi.
 ```bash
@@ -234,20 +254,43 @@ sudo kiwi-ng  --profile VMware system build --description ./kiwi-SLES-template/ 
 ```
 Сохраните получившейся файл __SLES15-SP4-Minimal-Rancher.x86_64-15.4.0.vmdk__
 10. Получившийся образ диска загрузить в хранилище VMware vSphere и использовать его для создание виртуальной машины используемой в дальнейшем как шаблон при развертывании.
-### Настройка Salt Master на Jump Host
-1. Установите пакет salt-master
-```
 
+### Утсноавите и настройте Docker
+Если Вы установили SLES с DVD без подключения источников обновления и дополнительных модулей, то оставьте DVD в приводе (Важно, Вам нужен full ISO):
+```bash
+yast2 add-on
 ```
-2. Скопируйте с внешнего носителя следующие файлы и папки:
+  Выберите Add => DVD => Подключите DVD образ => Отметьте "Containers Module" => Next => Accept => OK => Finish => OK
+ 
+Для установки docker выполните:
+```bash
+zypper in -y docker
+usermod -aG docker sles
+usermod -aG docker root
+chown root:docker /var/run/docker.sock
+```
+### Настройка Salt Master на Jump Host
+1. Если Вы установили SLES с DVD без подключения источников обновления и дополнительных модулей, то оставьте DVD в приводе (Важно, Вам нужен full ISO):
+```bash
+yast2 add-on
+```
+  Выберите Add => DVD => Подключите DVD образ => Отметьте "Server Applications Module" => Next => Accept => OK => Finish => OK
+
+2. Установите пакет salt-master
+```
+zypper in -y salt-master
+```
+3. Скопируйте с внешнего носителя следующие файлы и папки:
 -  папку ./salt/srv/reactor/ в /srv/
 -  папку ./salt/srv/salt в /srv/
 -  файл ./salt/etc/salt/master.d/master.conf в /etc/salt/master.d/
 -  файл ./salt/etc/salt/autosign_grains/autosign_key в /etc/salt/autosign_grains/
 -  файл ./salt/etc/salt/minion.d/minion.conf в /etc/salt/minion.d/
 -  файл ./salt/etc/salt/minion.d/autosign-grains.conf в /etc/salt/minion.d/
-salt-call --local state.apply
 
+```bash
+salt-call --local state.apply
+```
 
 ### Установка серверов SUSE Linux Enterprise для запуска SUSE Racnher
 1. Используйте получившийся образ для развертывания трех виртуальных машин для запуска SUSE Rancher.
