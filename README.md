@@ -93,7 +93,8 @@ sudo yast2 add-on
 sudo zypper in -y docker
 sudo usermod -aG docker sles
 sudo usermod -aG docker root
-sudo chown root:docker /var/run/docker.sock
+sudo systemctl enable --now docker
+          sudo chown root:docker /var/run/docker.sock
 ```
 2. Установка CLI helm
 ```bash
