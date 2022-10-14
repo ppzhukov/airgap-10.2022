@@ -34,9 +34,10 @@ style d10 fill:#EEEEEE
 2. Данный пример использует в качестве среды виртуализации VMware vSphere, но Вы можете использовать любую другую, создав необходимый шаблон виртуальной машины и подключив нужные модули в Rancher, если требуется его интеграция.
 3. Template для узлов в VMware vSphere (который мы создадим чуть позже), а также преднастроенные узлы и сетевой сегмент для развертывание.  
 4. Jump Host, с помощью которого будет производиться настройка узлов сети и на котором будет размещен Docker Registry
-5.  В вашей обособленной сети должна быть доступна служба DNS, если ее нет, Вы можете для тестов воспользоваться [sslip.io](https://github.com/cunnie/sslip.io) для реализации простого DNS доступа.
-6. Три узела для развертывания Rancher.
-7. Три узла для развертывания управляемого кластера (будут созданны Racnher, донастроенны cloud-init).
+5. В Вашей обособленной сети должна быть доступна служба DNS, если ее нет, Вы можете для тестов воспользоваться [sslip.io](https://github.com/cunnie/sslip.io) для реализации простого DNS доступа.
+6. В Вашей обособленной сети должен быть настроен DHCP. Вы можете использовать только статические адресса для Ваших стендов, но тема интеграции VMware vSphere с SUSE Rancher для использования только статическоих адресов и автоматического развертывания кластеров RKE выходит за рамки этого вебинара.
+7. Три узела для развертывания Rancher.
+8. Три узла для развертывания управляемого кластера (будут созданны Racnher, донастроенны cloud-init).
 
 ### Аппаратные требования
 - 1x Front Server
@@ -264,33 +265,13 @@ yast2 add-on
 zypper in -y docker
 usermod -aG docker sles
 usermod -aG docker root
+sudo systemctl enable --now docker
 chown root:docker /var/run/docker.sock
 ```
 
-
-chronyd:
-  service.running:
-    - enable: True
-    - watch:
-      - pkg: chrony
-      - file: /etc/chrony.d/ntp.conf
-    - require:
-      - pkg: chrony
-      - file: /etc/chrony.d/ntp.conf
-
-longhorn-install:
-  pkg.installed:
-    - names:
-      - open-iscsi
-      - nfs-kernel-server
-    - require:
-        - sls: registration
-
-nfs-server:
-  service.running:
-    - enable: True
-    - require:
-      - longhorn-install
+### Cloud Init 
+В приведенном cloud-init добавленны следующие настройки:
+chronyd
 
 [Файлы материалов](https://github.com/ppzhukov/airgap-10.2022/)
 
