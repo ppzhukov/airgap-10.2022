@@ -141,7 +141,7 @@ chmod +x rancher-save-images.sh
 ```
   2. Запустите __rancher-save-images.sh__ используя список образов __rancher-images.txt__ image для создания tarball:
 ```bash
-./rancher-save-images.sh --image-list ./rancher-images.txt
+sudo ./rancher-save-images.sh --image-list ./rancher-images.txt
 ```
 Результат: Docker начнет извлекаить (pulling) образы для установки с воздушным зазором. Будьте терпиливы. Этот процесс займет какое-то время. Когда процесс завершить будет сформирован файл __rancher-images.tar.gz__.
 
