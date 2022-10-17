@@ -80,7 +80,7 @@ style d10 fill:#EEEEEE
 1. Установить и запустить Docker
   - Если у Вас есть клоюч активации и система активирована выполните следующую команду:
 ```bash
-sudo SUSEConnect -p sle-module-containers/15.3/x86_64
+sudo SUSEConnect -p sle-module-containers/15.4/x86_64
 ```
 Или
   - Если Вы установили SLES с DVD без подключения источников обновления и дополнительных модулей, то оставьте DVD в приводе (Важно, Вам нужен full ISO):
