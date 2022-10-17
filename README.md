@@ -153,7 +153,7 @@ helm repo add rancher-stable https://releases.rancher.com/server-charts/stable
 helm fetch rancher-stable/rancher --version=v2.6.8
 ```
 
-8. Получите render шаблона cert-manager
+8. Получите render шаблона cert-manager (замените 192.168.0.10.sslip.io:5000 - на адрес вашего будущего registry, можете использовать для этого Jump Host)
 
 ```bash
 export registry_url=192.168.0.10.sslip.io:5000
