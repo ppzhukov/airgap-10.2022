@@ -66,7 +66,7 @@ style d10 fill:#EEEEEE
 - RKE2 v1.25.2+rke2r1
 - Rancher v2.6.8
 - SLES 15 SP4
-- Helm v3
+- Helm v3.9.4 (Supported Kubernetes Versions 1.24.x - 1.21.x)
 - Сert Manager v1.7.1
 - Longhorn v1.2
 
@@ -99,7 +99,9 @@ sudo chown root:docker /var/run/docker.sock
 ```
 2. Установка CLI helm
 ```bash
-curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+sudo ./get_helm.sh -v v3.9.4
 ```
 3. Найдите и скачайте файлы требуемой версии Rancher
 Перейдите страницу с данными [releases](https://github.com/rancher/rancher/releases) и найдите релиз v2.x.x версии которой хотите установить и нажмите Assets. Примечание. Не используйте выпуски с пометкой *rc* или *Pre-release*, так как они нестабильны и не для производственной среды.
@@ -185,7 +187,7 @@ helm template rancher ./rancher-2.6.8.tgz --output-dir . \
     --set systemDefaultRegistry=${registry_url} \
     --set replicas=1 \
     --set useBundledSystemChart=true \
-    --version=2.6.4
+    --version=2.6.8
 ```
 11. Скачайте утилиты CLI 
 ```bash
