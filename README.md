@@ -63,12 +63,12 @@ style d10 fill:#EEEEEE
   Поскольку мы совместили роли, нам понадобиться больше ресурсов для запуска реальной нагрузки.
 
 ### Используемые версии
-- RKE2 v1.25.2+rke2r1
-- Rancher v2.6.8
-- SLES 15 SP4
-- Helm v3.9.4 (Supported Kubernetes Versions 1.24.x - 1.21.x)
+- SUSE RKE2 v1.24.6+rke2r1 (Версия Kubernetes 1.24 для SUSE Rancher v2.6.8
+- SUSE Rancher v2.6.8
+- SUSE SLES 15 SP4
+- Helm v3.9.4 (Поддерживаемые версии Kubernetes 1.24.x - 1.21.x)
 - Сert Manager v1.7.1
-- Longhorn v1.2
+- SUSE Longhorn v1.2
 
 ## Установка и настройка сервера с доступом в интернет
 На данном сервере Вам потребуется Linux с установленным Docker. Я рекомендую установить SUSE Linux Enterprise Server в базовой конфигурации (Это может быть вариант Minimal для которого можно использовать следующую [инструкцию](front_server-install_script.md), но потребуется действующая подписка (ключ активации) для онлайн установки ряда пакетов).
@@ -192,8 +192,7 @@ helm template rancher ./rancher-2.6.8.tgz --output-dir . \
 11. Скачайте утилиты CLI 
 ```bash
 curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
-wget https://github.com/rancher/rke2/releases/download/v1.25.5%2Brke2r1/rke2.linux-amd64.tar.gz
-wget https://github.com/rancher/cli/releases/download/v2.6.8/rancher-linux-amd64-v2.6.8.tar.gz
+wget https://github.com/rancher/rke2/releases/download/v1.24.6%2Brke2r1/rke2.linux-amd64.tar.gz
 ```
 
 12. Получите образы registry
@@ -212,7 +211,6 @@ wget https://github.com/rancher/cli/releases/download/v2.6.8/rancher-linux-amd64
 - kubectl CLI
 - kubectl-minio CLI
 - rke2.linux-amd64.tar.gz
-- rancher-linux-amd64-v2.6.8.tar.gz
 - httpd.gz
 - registry.gz
 
