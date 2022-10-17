@@ -105,11 +105,18 @@ sudo ./get_helm.sh -v v3.9.4
 ```
 3. Найдите и скачайте файлы требуемой версии Rancher
 Перейдите страницу с данными [releases](https://github.com/rancher/rancher/releases) и найдите релиз v2.x.x версии которой хотите установить и нажмите Assets. Примечание. Не используйте выпуски с пометкой *rc* или *Pre-release*, так как они нестабильны и не для производственной среды.
-
 Скачайте из секции Assets следующие файлы (они тербуются для установки в окружение с воздушным зазором):
 - __rancher-images.txt__  Этот файл содержит список образов требуемых для установки Rancher, развертывания коастера и использования инструментов (tools) Rancher.
 - __rancher-save-images.sh__	Этот скрипт скачает (pulls) все образы из rancher-images.txt с Docker Hub и сохранит их как rancher-images.tar.gz
 - __rancher-load-images.sh__	Этот скрипт загрузит (loads) образы из rancher-images.tar.gz и выгрузит (pushes) в частное (private) registry.
+
+В данном вебинаре мы используем:
+```bash
+wget https://github.com/rancher/rancher/releases/download/v2.6.8/rancher-images.txt
+wget https://github.com/rancher/rancher/releases/download/v2.6.8/rancher-save-images.sh
+wget https://github.com/rancher/rancher/releases/download/v2.6.8/rancher-load-images.sh
+```
+
 
 4. Получите список образов cert-manager (менеджер сертификатов)
 При установке Kubernetes если Вы выберете использование самоподписные сертификаты (default self-signed TLS certificates) Вам требуется добавить список образов в файл __rancher-images.txt__.
@@ -131,6 +138,7 @@ sort -u rancher-images.txt -o rancher-images.txt
 
   2. Добавте образы RKE2 к файлу __rancher-images.txt__:
 ```bash
+wget https://github.com/rancher/rke2/releases/download/v1.24.6%2Brke2r1/rke2-images-all.linux-amd64.txt
 cat rke2-images-all.linux-amd64.txt >> ./rancher-images.txt
 ```
   3. Отсортируйте и оставьте только уникальные записи:
