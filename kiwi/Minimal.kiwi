@@ -56,6 +56,10 @@
         </type>
     </preferences>
 
+  <users group="root">
+      <user pwd="$1$suse$8xZqp834AVBxSB.CQ0IEf." home="/root" name="root"/>
+  </users>
+    
     <repository alias="DVD-1-Product-SLES">
         <source path="file:///media/suse/Product-SLES"/>
     </repository>
