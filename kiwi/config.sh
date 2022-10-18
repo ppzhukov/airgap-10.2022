@@ -65,6 +65,11 @@ baseSetRunlevel 3
 #--------------------------------------
 suseImportBuildKey
 
+#=Demo-stend==============================
+# Enable nfs-server for Longhorn
+#--------------------------------------
+chkconfig nfs-server on
+
 #======================================
 # Enable sshd
 #--------------------------------------
