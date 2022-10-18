@@ -14,7 +14,7 @@ while [[ $# -gt 0 ]]; do
         shift # past argument
         shift # past value
         ;;
-        -t|--registry_ip)
+        -i|--registry_ip)
         registry_ip="$2"
         shift # past argument
         shift # past value
@@ -35,7 +35,7 @@ done
 usage () {
     echo "USAGE: $0 --registry_fqdn 192.168.0.10.sslip.io --registry_ip 192.168.0.10"
     echo " Create directory and copy $0 in it"
-    echo " Generate CA and certificate for Rancher Server and registry node"
+    echo " Generate CA and certificate for registry node"
     echo " [-h|--help] Usage message"
 }
 
@@ -44,7 +44,7 @@ if [[ $help ]]; then
     exit 0
 fi
 
-if [[ -z registry_fqdn ]]; then
+if [[ -z $registry_fqdn ]]; then
     echo "Registry FQDN must be set"
     usage
     exit 0
