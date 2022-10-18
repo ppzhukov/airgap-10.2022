@@ -225,7 +225,7 @@ wget https://github.com/rancher/rke2/releases/download/v1.24.6%2Brke2r1/rke2.lin
 - registry.gz
 - SLE-15-SP4-Full-x86_64-GM-Media1.iso
 
-## Установка и настройка систем в изолированном контуре
+## Установка и настройка систем в изолированном контуре (Jump Host)
 ### Подготовка
 - Скачайте установочный образ SUSE Linux Enterprise Server 15 SP4 (full ISO)
 - Установите на Jump Host SUSE Linux Enterprise Server (оставьте подключенным к нему iso образ)
@@ -255,7 +255,17 @@ cp -r /usr/share/kiwi/image/suse-SLE15-Enterprise-Minimal ~/kiwi-SLES-template
 3. Замените в каталоге ~/kiwi-SLES-template/config.sh на файл [config.sh](kiwi/config.sh)
 4. Замените шаблон ~/kiwi-SLES-template/Minimal.kiwi на файл [Minimal.kiwi](kiwi/Minimal.kiwi) и измените пароль в готовом шаблоне получив его используя команду:
 ```bash
+openssl passwd -1 -salt '{Примесь для пароля}' {Ваш пароль}
+```
+пример:
+```bash
 openssl passwd -1 -salt 'suse' suse1234
+```
+в разделе:
+```
+  <users group="root">
+      <user password="$1$suse$8xZqp834AVBxSB.CQ0IEf." home="/root" name="root"/>
+  </users>
 ```
 5. Скачайте, если не сделали этого раньше, SUSE Linux Enterprise Server 15SP4 (full iso) SLE-15-SP4-Full-x86_64-GM-Media1.iso
 6. Создайте каталог __/media/suse__
@@ -272,7 +282,7 @@ sudo kiwi-ng  --profile VMware system build --description ./kiwi-SLES-template/ 
 ```
 Сохраните получившейся файл __SLES15-SP4-Minimal-Rancher.x86_64-15.4.0.vmdk__
 
-9. Получившийся образ диска загрузить в хранилище VMware vSphere и использовать его для создание виртуальной машины используемой в дальнейшем как шаблон при развертывании.
+9. Получившийся образ диска загрузить в хранилище VMware vSphere и использовать его для создание виртуальной машины используемой в дальнейшем как шаблон при развертывании узлов Rancher и RKE2.
 
 ### Утсноавите и настройте Docker
 Если Вы установили SLES с DVD без подключения источников обновления и дополнительных модулей, то оставьте DVD в приводе (Важно, Вам нужен full ISO):
@@ -283,12 +293,14 @@ yast2 add-on
  
 Для установки docker выполните:
 ```bash
-zypper in -y docker
-usermod -aG docker sles
-usermod -aG docker root
+sudo zypper in -y docker
+sudo usermod -aG docker sles
+sudo usermod -aG docker root
 sudo systemctl enable --now docker
-chown root:docker /var/run/docker.sock
+sudo chown root:docker /var/run/docker.sock
 ```
+
+
 
 ### Cloud Init 
 В приведенном cloud-init добавленны следующие настройки:
