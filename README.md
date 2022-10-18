@@ -234,7 +234,9 @@ wget https://github.com/rancher/rke2/releases/download/v1.24.6%2Brke2r1/rke2.lin
   - Server Applications Module
   - Development Tools Module
 Перечисленные ниже комманды исходят из того, что у Вас нет доступа к службе SUSE RMT (централизованного обновления) внутри изолированного сегдмента. Если у Вас есть служба RMT, просто замените команды подключения репозиториев аналогичиными с использованием SUSEConnect. Централизванное обновление выходит за рамки данного вебинара, но наличие этой службы во многом упростит работы.
-- 
+
+Копируйте Ваши данные полученные на сервере подключенном к интернет на Ваш Jump Host.
+
 ### Создания образа SLES для VMware vSphere
 1. На Jump Host установите пакет kiwi.
 Если Вы установили SLES с DVD без подключения источников обновления и дополнительных модулей, то оставьте DVD в приводе (Важно, Вам нужен full ISO):
@@ -246,32 +248,31 @@ yast2 add-on
 sudo zypper install -y python3-kiwi
 sudo zypper install -y kiwi-templates-Minimal
 ```
-2. Запустите комманду ниже для создания пароля пользователя root для образа
-```bash
-openssl passwd -1 -salt 'suse' suse1234
-```
-3. Копируйте каталог с настройками образа.
+2. Копируйте каталог с настройками образа.
 ```bash
 cp -r /usr/share/kiwi/image/suse-SLE15-Enterprise-Minimal ~/kiwi-SLES-template
 ```
-4. Скачайте и замените в каталоге скаченным файл [config.sh](kiwi/config.sh)
-5. Скачайте, замените скаченным и измените пароль в готовом шаблоне [Minimal.kiwi](kiwi/Minimal.kiwi)
-6. Скачайте SUSE Linux Enterprise Server 15SP4 (full iso) SLE-15-SP4-Full-x86_64-GM-Media1.iso
-7. Создайте каталог __/media/suse__
+3. Замените в каталоге ~/kiwi-SLES-template/config.sh на файл [config.sh](kiwi/config.sh)
+4. Замените шаблон ~/kiwi-SLES-template/Minimal.kiwi на файл [Minimal.kiwi](kiwi/Minimal.kiwi) и измените пароль в готовом шаблоне получив его используя команду:
+```bash
+openssl passwd -1 -salt 'suse' suse1234
+```
+5. Скачайте, если не сделали этого раньше, SUSE Linux Enterprise Server 15SP4 (full iso) SLE-15-SP4-Full-x86_64-GM-Media1.iso
+6. Создайте каталог __/media/suse__
 ```bash
 sudo mkdir -p /media/suse
 ```
-8. Подключите iso к каталогу.
+7. Подключите iso к каталогу.
 ```bash
 sudo mount SLE-15-SP4-Full-x86_64-GM-Media1.iso /media/suse/
 ```
-9. Запустите следующую команду, что-бы создать образ:
+8. Запустите следующую команду, что-бы создать образ:
 ```bash
 sudo kiwi-ng  --profile VMware system build --description ./kiwi-SLES-template/ --target-dir /tmp/out
 ```
 Сохраните получившейся файл __SLES15-SP4-Minimal-Rancher.x86_64-15.4.0.vmdk__
 
-10. Получившийся образ диска загрузить в хранилище VMware vSphere и использовать его для создание виртуальной машины используемой в дальнейшем как шаблон при развертывании.
+9. Получившийся образ диска загрузить в хранилище VMware vSphere и использовать его для создание виртуальной машины используемой в дальнейшем как шаблон при развертывании.
 
 ### Утсноавите и настройте Docker
 Если Вы установили SLES с DVD без подключения источников обновления и дополнительных модулей, то оставьте DVD в приводе (Важно, Вам нужен full ISO):
