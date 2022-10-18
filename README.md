@@ -209,7 +209,9 @@ wget https://github.com/rancher/rke2/releases/download/v1.24.6%2Brke2r1/rke2.lin
  sudo docker pull registry:2
  sudo docker save registry:2 |  gzip --stdout > registry.gz
 ```
+
 13. Скачайте с сайта [suse.com](https://suse.com) образ SLES 15 SP4 full ISO (SLE-15-SP4-Full-x86_64-GM-Media1.iso)
+Для этого не требуется ключ активации, только регистрация на сайте.
 
 14. Сделайте копию всех полученных данных на внешний носитель, для копирования в сегмент без доступа в интернет:
 - rancher-load-images.sh
