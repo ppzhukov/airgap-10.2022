@@ -228,12 +228,19 @@ wget https://github.com/rancher/rke2/releases/download/v1.24.6%2Brke2r1/rke2.lin
 - При установке добавте следующие модули:
   - Containers Module
   - Server Applications Module
+  - Development Tools Module
 Перечисленные ниже комманды исходят из того, что у Вас нет доступа к службе SUSE RMT (централизованного обновления) внутри изолированного сегдмента. Если у Вас есть служба RMT, просто замените команды подключения репозиториев аналогичиными с использованием SUSEConnect. Централизванное обновление выходит за рамки данного вебинара, но наличие этой службы во многом упростит работы.
 - 
 ### Создания образа SLES для VMware vSphere
 1. На Jump Host установите пакет kiwi.
+Если Вы установили SLES с DVD без подключения источников обновления и дополнительных модулей, то оставьте DVD в приводе (Важно, Вам нужен full ISO):
+```bash
+yast2 add-on
+```
+  Выберите Add => DVD => Подключите DVD образ => Отметьте "Development Tools Module" => Next => Accept => OK => Finish => OK
 ```bash
 sudo zypper install -y python3-kiwi
+sudo zypper install -y kiwi-templates-Minimal
 ```
 2. Запустите комманду ниже для создания пароля пользователя root для образа
 ```bash
@@ -241,9 +248,10 @@ openssl passwd -1 -salt 'suse' suse1234
 ```
 3. Копируйте каталог с настройками образа.
 ```bash
+cp -r /usr/share/kiwi/image/suse-SLE15-Enterprise-Minimal ~/
 ```
-4. Скачайте и замените в каталоге скаченным файл [config.sh](config.sh)
-5. Скачайте, замените скаченным и измените пароль в готовом шаблоне [Minimal.kiwi](Minimal.kiwi)
+4. Скачайте и замените в каталоге скаченным файл [config.sh](kiwi/config.sh)
+5. Скачайте, замените скаченным и измените пароль в готовом шаблоне [Minimal.kiwi](kiwi/Minimal.kiwi)
 6. Скачайте SUSE Linux Enterprise Server 15SP4 (full iso) SLE-15-SP4-Full-x86_64-GM-Media1.iso
 7. Создайте каталог __/media/suse__
 ```bash
