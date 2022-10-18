@@ -224,6 +224,9 @@ wget https://github.com/rancher/rke2/releases/download/v1.24.6%2Brke2r1/rke2.lin
 - httpd.gz
 - registry.gz
 - SLE-15-SP4-Full-x86_64-GM-Media1.iso
+Также для Вашего удобства к проекту приложенно несколько файлов, которые пригодятся для создания стенда:
+- [kiwi](kiwi)
+- [certs.sh](certs.sh)
 
 ## Установка и настройка систем в изолированном контуре (Jump Host)
 ### Подготовка
@@ -299,9 +302,148 @@ sudo usermod -aG docker root
 sudo systemctl enable --now docker
 sudo chown root:docker /var/run/docker.sock
 ```
+### Установка и настройка локального Registry (Jump Host)
+В данном примере мы создадим собственное Registry для размещения образов, но Вы можете воспользоваться любым подходящим используем Вами решением.
+#### Создание сертификатов для Registry
+В этом проекте приложен [скрипт](certs.sh) для создания сертификатов для Registry.
+Что-бы создать сертификаты выполните:
+```bash
+sudo zypper in -y gnutls
+sudo mkdir -p /opt/certificates
+```
+Копируйте [certs.sh](certs.sh) в /opt/certificates
+В комманде ниже замените FQDN и IP своими данными
+```bash
+cd /opt/certificates
+sudo chmod +x certs.sh
+sudo ./certs.sh --registry_fqdn 192.168.0.10.sslip.io --registry_ip 192.168.0.10
+cd ..
+```
+Нам понадобиться добавить созданый сертификат CA в доверенные для Docker для этого:
+- Установите утилиту jq
+```bash
+zypper in -y jq
+```
+Поменяйте FQDN Registry (в примере __192.168.0.10.sslip.io__) на Ваши данные используемые при создании сертификата и выполните:
+```bash
+export registry_fqdn=192.168.0.10.sslip.io
+export registry_url="https://${registry_fqdn}:8443"
+
+echo "$(jq --arg urlarg "${registry_url}" '. += {"registry-mirrors": [$urlarg]}' /etc/docker/daemon.json)" > /etc/docker/daemon.json
+
+cd /opt/certificates
+mkdir -p /etc/docker/certs.d/${registry_url}
+cp ${registry_fqdn}.cert ${registry_fqdn}.key ca.crt /etc/docker/certs.d/${registry_url}
+cd ..
+
+systemctl restart docker
+```
+#### Развертывание Registry
+Копируйте с внешнего носителя файлы:
+- httpd.gz
+- registry.gz
+
+Выполните следующие команды:
+```bash
+sudo docker load --input httpd.gz
+sudo docker load --input registry.gz
+sudo mkdir -p /opt/docker-certs
+sudo mkdir -p /opt/docker-auth
+sudo mkdir -p /opt/registry
+
+cd /opt/certificates/
+sudo cp registry.key.pem /opt/docker-certs/tls.key
+sudo openssl x509 -inform PEM -in registry.cert.pem -out /opt/docker-certs/tls.crt
+```
+
+Создайте пароль для доступа к Registry (Замените имя пользователя __geeko__ и пароль __P@ssw0rd__ на Ваши данные):
+```bash
+sudo sh -c 'docker run \
+ --entrypoint htpasswd \
+ httpd:2 -Bbn geeko P@ssw0rd > /opt/docker-auth/htpasswd'
+```
+
+Для запуска контейнеров выполните команды ниже.
+
+Мы запускаем два образа Registry использующих одну и туже общую папку (Один в режиме только для чтения) что-бы обеспечить работу как по паролю так и анонимного доступа.
+
+```bash
+sudo docker run -d \
+  --restart=always \
+  --name registry \
+  -v /opt/docker-certs:/certs:ro \
+  -v /opt/docker-auth:/auth:ro \
+  -v /opt/registry:/var/lib/registry \
+  -e "REGISTRY_AUTH=htpasswd" \
+  -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" \
+  -e "REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd" \
+  -e "REGISTRY_HTTP_ADDR=0.0.0.0:8443" \
+  -e "REGISTRY_HTTP_TLS_CERTIFICATE=/certs/tls.crt" \
+  -e "REGISTRY_HTTP_TLS_KEY=/certs/tls.key" \
+  -e "REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY=/var/lib/registry" \
+  -p 8443:8443 \
+  registry:2
+
+sudo docker run -d \
+  --restart=always \
+  --name registry-anonymous \
+  -v /opt/docker-certs:/certs:ro \
+  -v /opt/docker-auth:/auth:ro \
+  -v /opt/registry:/var/lib/registry:ro \
+  -e "REGISTRY_HTTP_TLS_CERTIFICATE=/certs/tls.crt" \
+  -e "REGISTRY_HTTP_TLS_KEY=/certs/tls.key" \
+  -e "REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY=/var/lib/registry" \
+  -p 5000:5000 \
+  registry:2
+```
+
+### Импортирование данных в локальный Registry
+Скопируйте подготовленные Вами на внешнем носителе данные на Jump Host. На потребуются:
+- rancher-load-images.sh
+- rancher-images.tar.gz
+- rancher-images.txt
+- ./rancher
+- ./cert-manager
+- kubectl
+- rke2.linux-amd64.tar.gz
+
+Установите kubectl:
+```bash
+sudo cp kubectl /usr/local/bin/
+sudo chmod +x /usr/local/bin/kubectl
+```
+Что-бы выгрузить образы поменяйте FQDN Registry (в примере __192.168.0.10.sslip.io__) на Ваши данные используемые при создании сертификата и выполните:
+
+```bash
+export registry_fqdn=192.168.0.10.sslip.io
+export registry_url="https://${registry_fqdn}:8443"
+
+sudo docker login ${registry_url}
+
+chmod +x rancher-load-images.sh
+sudo ./rancher-load-images.sh -l rancher-images.txt -r ${registry_fqdn}:8443
+```
+В результате должен получиться функционирующий Registry c образами требуемыми для установки с воздушным зазором. Последняя команда выполняется продолжительное время.
+
+### Развертывание SUSE Rancher
+Для первоначальной настройки и установки SUSE Rancher потребуется:
+- Развернуть 1 или 3 (для отказоустойчивости) виртуальные машины с Linux.
+- Установить на них RKE2 (Kubernetes)
+- Развернуть Cert Manager
+- Развернуть SUSE Rancher
+
+#### Установка Linux
+1. Использую получившийся шаблон разверните 1 или 3 виртуальные машины. _Не используйте 2 виртуальные машины, в этом случае ETCD не сможет выбрать лидера и система будет нейстойчивой_
+2. Разархивируйте утилиту rke2 на Jump Host (__rke2.linux-amd64.tar.gz__) и скопируйте получившившийся файл в папку __/root/bin/__ развернутых серверов.
+_В примере утилита копируется на сервер 192.168.0.21_
+```bash
+tar -zxf rke2.linux-amd64.tar.gz bin/rke2
+scp bin/rke2 192.168.0.21:
+```
+3.
 
 
-
+scp bin/rke2 
 ### Cloud Init 
 В приведенном cloud-init добавленны следующие настройки:
 chronyd
