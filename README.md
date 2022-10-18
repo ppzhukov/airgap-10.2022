@@ -73,7 +73,6 @@ style d10 fill:#EEEEEE
 ## Установка и настройка сервера с доступом в интернет
 На данном сервере Вам потребуется Linux с установленным Docker. Я рекомендую установить SUSE Linux Enterprise Server в базовой конфигурации (Это может быть вариант Minimal для которого можно использовать следующую [инструкцию](front_server-install_script.md), но потребуется действующая подписка (ключ активации) для онлайн установки ряда пакетов).
 Вы можете установить все обновления SUSE Linux Enterprise Server, для этого Вам потребуется ключ активации, возможно также использование триального ключа.
-Вы также можете использовать OpenSUSE заменив ряд команд.
 И так, если Вы решили использовать SUSE Linux Enterprise Server, при установке добавте следующие модули:
   - Containers Module
   - Server Applications Module
@@ -210,7 +209,9 @@ wget https://github.com/rancher/rke2/releases/download/v1.24.6%2Brke2r1/rke2.lin
  sudo docker pull registry:2
  sudo docker save registry:2 |  gzip --stdout > registry.gz
 ```
-13. Сделайте копию всех полученных данных на внешний носитель, для копирования в сегмент без доступа в интернет:
+13. Скачайте с сайта [suse.com](https://suse.com) образ SLES 15 SP4 full ISO (SLE-15-SP4-Full-x86_64-GM-Media1.iso)
+
+14. Сделайте копию всех полученных данных на внешний носитель, для копирования в сегмент без доступа в интернет:
 - rancher-load-images.sh
 - rancher-images.tar.gz
 - rancher-images.txt
@@ -220,6 +221,7 @@ wget https://github.com/rancher/rke2/releases/download/v1.24.6%2Brke2r1/rke2.lin
 - rke2.linux-amd64.tar.gz
 - httpd.gz
 - registry.gz
+- SLE-15-SP4-Full-x86_64-GM-Media1.iso
 
 ## Установка и настройка систем в изолированном контуре
 ### Подготовка
@@ -248,7 +250,7 @@ openssl passwd -1 -salt 'suse' suse1234
 ```
 3. Копируйте каталог с настройками образа.
 ```bash
-cp -r /usr/share/kiwi/image/suse-SLE15-Enterprise-Minimal ~/
+cp -r /usr/share/kiwi/image/suse-SLE15-Enterprise-Minimal ~/kiwi-SLES-template
 ```
 4. Скачайте и замените в каталоге скаченным файл [config.sh](kiwi/config.sh)
 5. Скачайте, замените скаченным и измените пароль в готовом шаблоне [Minimal.kiwi](kiwi/Minimal.kiwi)
