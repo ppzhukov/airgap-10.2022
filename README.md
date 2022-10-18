@@ -205,10 +205,10 @@ wget https://github.com/rancher/rke2/releases/download/v1.24.6%2Brke2r1/rke2.lin
 
 12. Получите образы registry
 ```bash
- docker pull httpd:2
- docker save httpd:2 |  gzip --stdout > httpd.gz
- docker pull registry:2
- docker save registry:2 |  gzip --stdout > registry.gz
+ sudo docker pull httpd:2
+ sudo docker save httpd:2 |  gzip --stdout > httpd.gz
+ sudo docker pull registry:2
+ sudo docker save registry:2 |  gzip --stdout > registry.gz
 ```
 13. Сделайте копию всех полученных данных на внешний носитель, для копирования в сегмент без доступа в интернет:
 - rancher-load-images.sh
@@ -216,8 +216,7 @@ wget https://github.com/rancher/rke2/releases/download/v1.24.6%2Brke2r1/rke2.lin
 - rancher-images.txt
 - ./rancher
 - ./cert-manager
-- kubectl CLI
-- kubectl-minio CLI
+- kubectl
 - rke2.linux-amd64.tar.gz
 - httpd.gz
 - registry.gz
