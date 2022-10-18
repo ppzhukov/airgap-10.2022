@@ -68,6 +68,7 @@ suseImportBuildKey
 #=Demo-stend==============================
 # Enable nfs-server for Longhorn
 #--------------------------------------
+dracut -f
 chkconfig nfs-server on
 
 #======================================
