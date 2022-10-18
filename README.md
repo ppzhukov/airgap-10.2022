@@ -36,8 +36,9 @@ style d10 fill:#EEEEEE
 4. Jump Host, с помощью которого будет производиться настройка узлов сети и на котором будет размещен Docker Registry
 5. В Вашей обособленной сети должна быть доступна служба DNS, если ее нет, Вы можете для тестов воспользоваться [sslip.io](https://github.com/cunnie/sslip.io) для реализации простого DNS доступа.
 6. В Вашей обособленной сети должен быть настроен DHCP. Вы можете использовать только статические адресса для Ваших стендов, но тема интеграции VMware vSphere с SUSE Rancher для использования только статическоих адресов и автоматического развертывания кластеров RKE выходит за рамки этого вебинара.
-7. Три узела для развертывания Rancher.
-8. Три узла для развертывания управляемого кластера (будут созданны Racnher, донастроенны cloud-init).
+7. В Вашей обособленной сети должена быть настроена служба синхронизации времени NTP. (например Chrony)
+8. Три узела для развертывания Rancher.
+9. Три узла для развертывания управляемого кластера (будут созданны Racnher, донастроенны cloud-init).
 
 ### Аппаратные требования
 - 1x Front Server
@@ -51,15 +52,15 @@ style d10 fill:#EEEEEE
   1 x HDD 300GB (для registry)
   Поскольку мы совместили роли, нам понадобиться больше места: хранить копию данных образов для загрузки, копию данных образов в Docker, копию данных образов в Registry.
 
-- 3x dedicate server for Rancher
+- 1x dedicate server for Rancher
   4 vCPU
   16 GiB RAM
-  1 x HDD - > 100 GB
+  1 x HDD 100 GB
 
 - 3x RKE2 Node - role: ETCD, Controls Plane, Worker
   16 vCPU
   64 GiB RAM
-  1 x HDD - > 320 GB
+  1 x HDD 320 GB
   Поскольку мы совместили роли, нам понадобиться больше ресурсов для запуска реальной нагрузки.
 
 ### Используемые версии
@@ -432,18 +433,48 @@ sudo ./rancher-load-images.sh -l rancher-images.txt -r ${registry_fqdn}:8443
 - Развернуть Cert Manager
 - Развернуть SUSE Rancher
 
-#### Установка Linux
-1. Использую получившийся шаблон разверните 1 или 3 виртуальные машины. _Не используйте 2 виртуальные машины, в этом случае ETCD не сможет выбрать лидера и система будет нейстойчивой_
-2. Разархивируйте утилиту rke2 на Jump Host (__rke2.linux-amd64.tar.gz__) и скопируйте получившившийся файл в папку __/root/bin/__ развернутых серверов.
-_В примере утилита копируется на сервер 192.168.0.21_
+#### Установка Linux на Ваш сервер SUSE Rancher
+1. Использую получившийся шаблон разверните виртуальную машину.
+В данном руководстве мы используем 1 сервер для Rancher.
+Не забудьте указать правильный размер ресурсов, увеличить предоставляемый жесткий диск и т.д.
+2. Настройте на Вашем сервере сеть в соответсвии с выбраным IP адресом и именем заданным при __получении render шаблона Rancher__. 
+3. Настройте на Вашем сервере службу синхронизации времени (например chrony). 
+### Установка __RKE2__ на Ваш сервер SUSE Rancher
+1. Копируйте (__rke2.linux-amd64.tar.gz__) на Ваш сервер Rancher и разархивируйте утилиту __rke2__ в папку __/usr/local/bin/__ .
+_В примерах сдесь и далее в качестве адреса сервера SUSE Rancher используется адрес 192.168.0.11_
+На Jump Host выполните:
 ```bash
-tar -zxf rke2.linux-amd64.tar.gz bin/rke2
-scp bin/rke2 192.168.0.21:
+scp rke2.linux-amd64.tar.gz root@192.168.0.11:/tmp/
 ```
-3.
+Зайдите на консоль сервера SUSE Rancher и выполните:
+```bash
+tar xzf "/tmp/rke2.linux-amd64.tar.gz" -C "/usr/local"
+```
+2. Сделайте доверенным сертификат Вашего сервера Registry.
+Копируйте файл __/opt/certificates/cacert.pem__ с Jump Host на сервер SUSE Rancher:
+```bash
+scp /opt/certificates/cacert.pem root@192.168.0.11:/etc/pki/trust/anchors/rancher-stend.pem
+```
+Зайдите на консоль сервера SUSE Rancher и выполните:
+```bash
+update-ca-certificates && c_rehash
+```
+3. Настройте используемый по умолчанию Registry
+Зайдите на консоль сервера SUSE Rancher и выполните (заменив на адрес Вашего Registry):
+```bash
+export registry_fqdn=192.168.0.10.sslip.io
+export registry_uri="${registry_fqdn}:5000"
+mkdir -p /etc/rancher/rke2
+echo 'system-default-registry: \"'${registry_uri}'\"' > /etc/rancher/rke2/config.yaml
+```
+4. Зарустите __RKE2__
+```bash
+systemctl enable rke2-server --now
+```
+### Установка SUSE Rancher
 
 
-scp bin/rke2 
+
 ### Cloud Init 
 В приведенном cloud-init добавленны следующие настройки:
 chronyd
