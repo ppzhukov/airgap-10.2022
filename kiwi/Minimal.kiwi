@@ -141,7 +141,12 @@
     <!--ZIP for Terraform archive provider-->
         <package name="zip" />
         <package name="unzip" />
-  
+      <!--Packages for Longhorn-->
+        <package name="open-iscsi" />
+        <package name="nfs-kernel-server" />
+      <!--Packages for demo stend-->
+        <package name="yast2-network" />
+        <package name="yast2-ntp-client" />
     </packages>
 
     <packages type="bootstrap">
