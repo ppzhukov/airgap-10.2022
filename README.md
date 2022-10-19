@@ -429,7 +429,7 @@ sudo ./rancher-load-images.sh -l rancher-images.txt -r ${registry_fqdn}:8443
 ### Развертывание SUSE Rancher
 Для первоначальной настройки и установки SUSE Rancher потребуется:
 - Развернуть 1 или 3 (для отказоустойчивости) виртуальные машины с Linux.
-- Установить на них RKE2 (Kubernetes)
+- Установить на него (них) RKE2 (Kubernetes)
 - Развернуть Cert Manager
 - Развернуть SUSE Rancher
 
