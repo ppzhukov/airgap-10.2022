@@ -133,7 +133,7 @@
         <package name="shim" arch="aarch64,x86_64"/>
 
         <package name="open-vm-tools" arch="x86_64"/>
-        <package name="kernel-default-base"/>
+        <package name="kernel-default"/>
 
         <package name="cloud-init" />
         <package name="cloud-init-config-suse" />
@@ -148,7 +148,6 @@
         <package name="keyutils" />
         <package name="libevent-2_1-8 " />
         <package name="nfs-client " />
-        <package name="nfs-kernel-server" /> 
         <package name="nfsidmap" />
         <package name="rpcbind" />
         
