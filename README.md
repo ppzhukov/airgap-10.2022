@@ -471,7 +471,7 @@ update-ca-certificates && c_rehash
 export registry_fqdn=192.168.0.10.sslip.io
 export registry_uri="${registry_fqdn}:5000"
 mkdir -p /etc/rancher/rke2
-echo 'system-default-registry: \"'${registry_uri}'\"' > /etc/rancher/rke2/config.yaml
+echo 'system-default-registry: "'${registry_uri}'"' > /etc/rancher/rke2/config.yaml
 ```
 4. Зарустите __RKE2__
 ```bash
