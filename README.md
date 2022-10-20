@@ -184,6 +184,7 @@ curl -L -o cert-manager/cert-manager-crd.yaml https://github.com/jetstack/cert-m
 10. Получите render шаблона Rancher
 Вы можете использовать как самоподписные, так и собственные сертификаты для установки Rancher, ниже пример для самоподписных сертификатов.
 Ниже в переменной __rancher_fqdn__ Вы должны указать FQDN для будущего сервера Rancher. А в переменной __registry_url__ URL вашего registry в безопасном сегменте (как например адрес и порт используемых в данной инструкции Jump Host, если у Вас нет готового registry)
+_опция --set replicas=1 указывает развернуть сервер Rancher с одной репликой, измените значения на 3 для отказоустойчивой архитектуры_
 ```bash
 export rancher_fqdn=192.168.0.11.sslip.io
 export registry_url=192.168.0.10.sslip.io:5000
