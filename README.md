@@ -528,7 +528,10 @@ _Результат: у Вас получится установить RKE2 (Kub
 
 ### Cloud Init 
 В приведенном cloud-init добавлены следующие настройки:
-chronyd
+```
+echo "pool 192.168.0.10 iburst" >> /etc/chrony.conf
+systemctl restart chronyd 
+```
 
 [Файлы материалов](https://github.com/ppzhukov/airgap-10.2022/)
 
