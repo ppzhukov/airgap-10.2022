@@ -528,6 +528,11 @@ _Результат: у Вас получится установить RKE2 (Kub
 - Зайдите на web интерфейс установленного SUSE Rancher используя адрес указанный при render шаблона Rancher.
 - Создайте RKE/RKE2 кластер используя web интерфейс.
 - Убедитесь, что при создании у Вас указана настройка Registry.
+- Если Вы используете собственный или самоподписной сертификат для Вашего локального Registry
+Выберите в разделе __Cluster Configuration__ вкладку __Registries__
+Установите выбор в __Configure advanced containerd mirroring and registry authentication options__
+В разделе __Registry Authentication__ нажмите __Add Registry__ введите адрес Registry (только FQDN без номера порта) и установите флажок __Skip TLS Verifications__
+
 #### Cloud Init 
 В приведенном демо стенде мы используем cloud-init для настройки синхронизации времени (замените IP адрес, на адрес своего источника времени):
 ```
