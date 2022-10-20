@@ -139,6 +139,7 @@ sort -u rancher-images.txt -o rancher-images.txt
   2. Добавте образы RKE2 к файлу __rancher-images.txt__:
 ```bash
 wget https://github.com/rancher/rke2/releases/download/v1.24.6%2Brke2r1/rke2-images-all.linux-amd64.txt
+sed -i 's/docker\.io//' rke2-images-all.linux-amd64.txt
 cat rke2-images-all.linux-amd64.txt >> ./rancher-images.txt
 ```
   3. Отсортируйте и оставьте только уникальные записи:
@@ -232,7 +233,8 @@ wget https://github.com/rancher/rke2/releases/download/v1.24.6%2Brke2r1/rke2.lin
 ## Установка и настройка систем в изолированном контуре (Jump Host)
 ### Подготовка
 - Скачайте установочный образ SUSE Linux Enterprise Server 15 SP4 (full ISO)
-- Установите на Jump Host SUSE Linux Enterprise Server (оставьте подключенным к нему iso образ)
+- Установите на Jump Host SUSE Linux Enterprise Server (оставьте подключенным к нему iso образ).
+- Настройте firewall если планитуете использовать на Jump Host Registry или деактивируйте firewall.
 - При установке добавте следующие модули:
   - Containers Module
   - Server Applications Module
@@ -305,6 +307,7 @@ sudo chown root:docker /var/run/docker.sock
 ```
 ### Установка и настройка локального Registry (Jump Host)
 В данном примере мы создадим собственное Registry для размещения образов, но Вы можете воспользоваться любым подходящим используем Вами решением.
+_Если Вы настраиваете Registry на своем Jump Host убедитесь, пожалуйста, что у Вас открыты порты 8443 и 5000 в Вашем firewall или деактивируйте его_
 #### Создание сертификатов для Registry
 В этом проекте приложен [скрипт](certs.sh) для создания сертификатов для Registry.
 Что-бы создать сертификаты выполните:
@@ -481,7 +484,7 @@ systemctl enable rke2-server --now
 _В примерах ниже замените адрес 192.168.0.11 на адрес Вашего сервера Rancher._
 Скопируйте файл конфигурации kubectl на Ваш Jump Host
 ```bash
-scp 192.168.0.11:/etc/rancher/rke2/rke2.yaml kubeconfig-rancher.yaml
+scp root@192.168.0.11:/etc/rancher/rke2/rke2.yaml kubeconfig-rancher.yaml
 ```
 Замените в нем адрес подключения с __127.0.0.1__ на __192.168.0.11__
 ```bash
@@ -492,6 +495,10 @@ sed -i 's/127.0.0.1/192.168.0.11/' ./kubeconfig-rancher.yaml
 Укажите где брать настройки kubectl
 ```bash
 export KUBECONFIG=~/kubeconfig-rancher.yaml
+```
+Дождитесь старта Kuberntes, проконтролировить можно, например, командой:
+```bash
+kubectl get nodes
 ```
 Создайте __Name Space__
 ```bash
