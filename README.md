@@ -528,18 +528,25 @@ _Результат: у Вас получится установить RKE2 (Kub
 - Зайдите на web интерфейс установленного SUSE Rancher используя адрес указанный при render шаблона Rancher.
 - Создайте RKE/RKE2 кластер используя web интерфейс.
 - Убедитесь, что при создании у Вас указана настройка Registry.
-- Если Вы используете собственный или самоподписной сертификат для Вашего локального Registry
-Выберите в разделе __Cluster Configuration__ вкладку __Registries__
-Установите выбор в __Configure advanced containerd mirroring and registry authentication options__
-В разделе __Registry Authentication__ нажмите __Add Registry__ введите адрес Registry (только FQDN без номера порта) и установите флажок __Skip TLS Verifications__
+- Ноды кластера должны доверять Вашему Registry, поэтому требуется добавить на новых узлах CA сертификата в доверянные, в данной демонстрации мы сделаем это с помощью cloud-init
 
 #### Cloud Init 
-В приведенном демо стенде мы используем cloud-init для настройки синхронизации времени (замените IP адрес, на адрес своего источника времени):
+В приведенном демо стенде мы используем cloud-init для настройки синхронизации времени (замените IP адрес, на адрес своего источника времени) и добавления CA в доверянные (Замените данными вашего CA - файл _/opt/certificates/cacert.pem_ на Jump Host):
 ```
 #cloud-config
+write_files:
+  - path: /etc/pki/trust/anchors/rancher-stend.pem
+    content: |    
+        -----BEGIN CERTIFICATE-----
+        Данные Вашего сертификата.
+        Незабудьте про отступы в этом файле
+        -----END CERTIFICATE-----
+
 runcmd:
+  - systemctl disable firewalld --now
   - echo "pool 192.168.0.10 iburst" >> /etc/chrony.conf
-  - systemctl restart chronyd 
+  - systemctl restart chronyd
+  - update-ca-certificates && c_rehash
 ```
 
 [Файлы материалов](https://github.com/ppzhukov/airgap-10.2022/)
