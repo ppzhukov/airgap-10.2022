@@ -67,8 +67,10 @@ suseImportBuildKey
 
 #=Demo-stend===========================
 # Enable nfs-server for Longhorn
+# Disable firewall
 #--------------------------------------
 chkconfig nfs-server on
+systemctl disable firewalld.service --now
 
 #======================================
 # Enable sshd
