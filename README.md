@@ -85,7 +85,9 @@ sudo SUSEConnect -p sle-module-containers/15.4/x86_64
 sudo yast2 add-on
 ```
   Выберите Add => DVD => Подключите DVD образ => Отметьте "Containers Module" и "Server Applications Module" => Next => Accept => OK => Finish => OK
- [!asciinema](https://asciinema.org/a/PhQlui3Vy3xYhg9FOuDofPWnY)
+  
+ [![asciicast](https://asciinema.org/a/PhQlui3Vy3xYhg9FOuDofPWnY.png)(https://asciinema.org/a/PhQlui3Vy3xYhg9FOuDofPWnY)
+
 Для установки docker выполните:
 ```bash
 sudo zypper in -y docker
