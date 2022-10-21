@@ -92,7 +92,6 @@ sudo yast2 add-on
 Для установки docker выполните:
 ```bash
 sudo zypper in -y docker
-sudo usermod -aG docker sles
 sudo usermod -aG docker root
 sudo systemctl enable --now docker
 sudo chown root:docker /var/run/docker.sock
@@ -122,10 +121,9 @@ wget https://github.com/rancher/rancher/releases/download/v2.6.8/rancher-load-im
 При установке Kubernetes если Вы выберете использование самоподписные сертификаты (default self-signed TLS certificates) Вам требуется добавить список образов в файл __rancher-images.txt__.
   1. Получите latest cert-manager helm chart и выгрузите из шаблона информацию об образах:
 ```bash
-helm repo add jetstack https://charts.jetstack.io
-helm repo update
-helm fetch jetstack/cert-manager --version v1.7.1
-helm template ./cert-manager-v1.7.1.tgz | awk '$1 ~ /image:/ {print $2}' | sed s/\"//g >> ./rancher-images.txt
+wget https://github.com/rancher/rancher/releases/download/v2.6.8/rancher-images.txt
+wget https://github.com/rancher/rancher/releases/download/v2.6.8/rancher-save-images.sh
+wget https://github.com/rancher/rancher/releases/download/v2.6.8/rancher-load-images.sh
 ``` 
   2. Отсортируйте список и оставьте только уникальные записи:
 ```bash
@@ -139,7 +137,7 @@ sort -u rancher-images.txt -o rancher-images.txt
   2. Добавьте образы RKE2 к файлу __rancher-images.txt__:
 ```bash
 wget https://github.com/rancher/rke2/releases/download/v1.24.6%2Brke2r1/rke2-images-all.linux-amd64.txt
-sed -i 's/docker\.io//' rke2-images-all.linux-amd64.txt
+sed -i 's/docker\.io\///' rke2-images-all.linux-amd64.txt
 cat rke2-images-all.linux-amd64.txt >> ./rancher-images.txt
 ```
   3. Отсортируйте и оставьте только уникальные записи:
