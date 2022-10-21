@@ -74,9 +74,6 @@ style d10 fill:#EEEEEE
 ## Установка и настройка сервера с доступом в интернет
 На данном сервере Вам потребуется Linux с установленным Docker. Я рекомендую установить SUSE Linux Enterprise Server в базовой конфигурации (Это может быть вариант Minimal для которого можно использовать следующую [инструкцию](front_server-install_script.md), но потребуется действующая подписка (ключ активации) для онлайн установки ряда пакетов).
 Вы можете установить все обновления SUSE Linux Enterprise Server, для этого Вам потребуется ключ активации, возможно также использование триального ключа.
-И так, если Вы решили использовать SUSE Linux Enterprise Server, при установке добавьте следующие модули:
-  - Containers Module
-  - Server Applications Module
 1. Установить и запустить Docker
   - Если у Вас есть ключ активации и система активирована выполните следующую команду:
 ```bash
@@ -87,8 +84,8 @@ sudo SUSEConnect -p sle-module-containers/15.4/x86_64
 ```bash
 sudo yast2 add-on
 ```
-  Выберите Add => DVD => Подключите DVD образ => Отметьте "Containers Module" => Next => Accept => OK => Finish => OK
- 
+  Выберите Add => DVD => Подключите DVD образ => Отметьте "Containers Module" и "Server Applications Module" => Next => Accept => OK => Finish => OK
+ [!asciinema](https://asciinema.org/a/PhQlui3Vy3xYhg9FOuDofPWnY)
 Для установки docker выполните:
 ```bash
 sudo zypper in -y docker
