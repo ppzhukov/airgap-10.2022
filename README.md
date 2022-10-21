@@ -42,13 +42,13 @@ style d10 fill:#EEEEEE
 
 ### Аппаратные требования
 - 1x Front Server
-  4 vCPU
-  16 GiB RAM
+  2 vCPU
+  4 GiB RAM
   1 x HDD 300GB 
 
 - 1x Jump Host
-  4 vCPU
-  16 GiB RAM
+  2 vCPU
+  4 GiB RAM
   1 x HDD 300GB (для registry)
   Поскольку мы совместили роли, нам понадобиться больше места: хранить копию данных образов для загрузки, копию данных образов в Docker, копию данных образов в Registry.
 
