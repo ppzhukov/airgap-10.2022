@@ -87,7 +87,7 @@ sudo yast2 add-on
   Выберите Add => DVD => Подключите DVD образ => Отметьте "Containers Module" и "Server Applications Module" => Next => Accept => OK => Finish => OK
   
   
- [![add_modules](<img src="https://asciinema.org/a/PhQlui3Vy3xYhg9FOuDofPWnY.png" width="250">)](https://asciinema.org/a/PhQlui3Vy3xYhg9FOuDofPWnY)
+ [![add_modules](https://asciinema.org/a/PhQlui3Vy3xYhg9FOuDofPWnY.svg)](https://asciinema.org/a/PhQlui3Vy3xYhg9FOuDofPWnY?autoplay=1)
 
 Для установки docker выполните:
 ```bash
