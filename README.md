@@ -121,9 +121,10 @@ wget https://github.com/rancher/rancher/releases/download/v2.6.8/rancher-load-im
 При установке Kubernetes если Вы выберете использование самоподписные сертификаты (default self-signed TLS certificates) Вам требуется добавить список образов в файл __rancher-images.txt__.
   1. Получите latest cert-manager helm chart и выгрузите из шаблона информацию об образах:
 ```bash
-wget https://github.com/rancher/rancher/releases/download/v2.6.8/rancher-images.txt
-wget https://github.com/rancher/rancher/releases/download/v2.6.8/rancher-save-images.sh
-wget https://github.com/rancher/rancher/releases/download/v2.6.8/rancher-load-images.sh
+helm repo add jetstack https://charts.jetstack.io
+helm repo update
+helm fetch jetstack/cert-manager --version v1.7.1
+helm template ./cert-manager-v1.7.1.tgz | awk '$1 ~ /image:/ {print $2}' | sed s/\"//g >> ./rancher-images.txt
 ``` 
   2. Отсортируйте список и оставьте только уникальные записи:
 ```bash
