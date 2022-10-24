@@ -70,7 +70,6 @@ suseImportBuildKey
 # Disable firewall
 #--------------------------------------
 chkconfig nfs-server on
-systemctl disable firewalld.service --now
 
 #======================================
 # Enable sshd
@@ -94,10 +93,12 @@ else
         systemctl enable jeos-firstboot.service
 fi
 
-# Enable firewalld if installed
+#=Demo-stend===========================
+# Disable firewalld if installed
 if [ -x /usr/sbin/firewalld ]; then
-        chkconfig firewalld on
+        chkconfig firewalld off
 fi
+
 
 # Set GRUB2 to boot graphically (bsc#1097428)
 sed -Ei"" "s/#?GRUB_TERMINAL=.+$/GRUB_TERMINAL=gfxterm/g" /etc/default/grub
