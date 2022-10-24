@@ -288,7 +288,7 @@ sudo mount SLE-15-SP4-Full-x86_64-GM-Media1.iso /media/suse/
 ```bash
 sudo kiwi-ng  --profile VMware system build --description ./kiwi-SLES-template/ --target-dir /tmp/out
 ```
-Сохраните получившейся файл __SLES15-SP4-Minimal-Rancher.x86_64-15.4.0.vmdk__
+Сохраните получившейся файл __SLES15-SP4-Minimal-RKE2.x86_64-15.4.0.vmdk__
 
 9. Получившийся образ диска загрузить в хранилище VMware vSphere и использовать его для создание виртуальной машины используемой в дальнейшем как шаблон при развертывании узлов Rancher и RKE2.
 
