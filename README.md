@@ -316,7 +316,7 @@ _Если Вы настраиваете Registry на своем Jump Host уб�
 sudo zypper in -y gnutls
 sudo mkdir -p /opt/certificates
 ```
-Копируйте [certs.sh](certs.sh) в /opt/certificates
+Скопируйте [certs.sh](certs.sh) в /opt/certificates
 В команде ниже замените FQDN и IP своими данными
 ```bash
 cd /opt/certificates
