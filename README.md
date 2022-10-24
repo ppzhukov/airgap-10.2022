@@ -327,13 +327,14 @@ cd ..
 Нам понадобиться добавить созданный сертификат CA в доверенные для Docker для этого:
 - Установите утилиту jq
 ```bash
-zypper in -y jq
+sudo zypper in -y jq
 ```
-Поменяйте FQDN Registry (в примере __192.168.0.10.sslip.io__) на Ваши данные, используемые при создании сертификата и выполните:
+Поменяйте FQDN Registry (в примере __192.168.0.10.sslip.io__) на Ваши данные, используемые при создании сертификата и выполните (в примере, действия выполненны от учетной записи __root__):
+
 ```bash
+su -
 export registry_fqdn=192.168.0.10.sslip.io
 export registry_url="https://${registry_fqdn}:8443"
-
 echo "$(jq --arg urlarg "${registry_url}" '. += {"registry-mirrors": [$urlarg]}' /etc/docker/daemon.json)" > /etc/docker/daemon.json
 
 cd /opt/certificates
