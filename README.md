@@ -236,7 +236,7 @@ wget https://github.com/rancher/rke2/releases/download/v1.24.6%2Brke2r1/rke2.lin
 - Скачайте установочный образ SUSE Linux Enterprise Server 15 SP4 (full ISO)
 - Установите на Jump Host SUSE Linux Enterprise Server (оставьте подключенным к нему iso образ).
 - Настройте firewall если планируете использовать на Jump Host Registry или деактивируйте firewall.
-- При установке добавьте следующие модули:
+- Если у Вас доступен сервис RMT при установке добавьте следующие модули:
   - Containers Module
   - Server Applications Module
   - Development Tools Module
