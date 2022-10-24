@@ -256,7 +256,7 @@ sudo yast2 add-on
 sudo zypper install -y python3-kiwi
 sudo zypper install -y kiwi-templates-Minimal
 ```
-2. Копируйте каталог с настройками образа.
+2. Скопируйте каталог с настройками образа.
 ```bash
 cp -r /usr/share/kiwi/image/suse-SLE15-Enterprise-Minimal ~/kiwi-SLES-template
 ```
