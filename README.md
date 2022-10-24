@@ -302,7 +302,6 @@ sudo yast2 add-on
 Для установки docker выполните:
 ```bash
 sudo zypper in -y docker
-sudo usermod -aG docker sles
 sudo usermod -aG docker root
 sudo systemctl enable --now docker
 sudo chown root:docker /var/run/docker.sock
