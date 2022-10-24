@@ -249,7 +249,7 @@ wget https://github.com/rancher/rke2/releases/download/v1.24.6%2Brke2r1/rke2.lin
 1. На Jump Host установите пакет kiwi.
 Если Вы установили SLES с DVD без подключения источников обновления и дополнительных модулей, то оставьте DVD в приводе (Важно, Вам нужен full ISO):
 ```bash
-yast2 add-on
+sudo yast2 add-on
 ```
   Выберите Add => DVD => Подключите DVD образ => Отметьте "Development Tools Module" => Next => Accept => OK => Finish => OK
 ```bash
@@ -295,7 +295,7 @@ sudo kiwi-ng  --profile VMware system build --description ./kiwi-SLES-template/ 
 ### Установите и настройте Docker
 Если Вы установили SLES с DVD без подключения источников обновления и дополнительных модулей, то оставьте DVD в приводе (Важно, Вам нужен full ISO):
 ```bash
-yast2 add-on
+sudo yast2 add-on
 ```
   Выберите Add => DVD => Подключите DVD образ => Отметьте "Containers Module" => Next => Accept => OK => Finish => OK
  
