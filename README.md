@@ -522,7 +522,7 @@ kubectl create namespace cattle-system
 kubectl -n cattle-system apply -R -f ./rancher
 ```
 
-_Результат: у Вас получится установить RKE2 (Kuberntes) и установить в него SUSE Rancher используя локальный Registry и без подключения к интернет_
+_Результат: у Вас получится установить RKE2 (Kubernetes) и установить в него SUSE Rancher используя локальный Registry и без подключения к интернет_
 
 ### Развертывание Kubernetes с помощью SUSE Rancher.
 Для развертывания RKE2 с помощью установленного сервера SUSE Rancher сделайте следующее:
