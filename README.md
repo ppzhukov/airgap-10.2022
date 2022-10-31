@@ -442,6 +442,14 @@ sudo ./rancher-load-images.sh -l rancher-images.txt -r ${registry_fqdn}:8443
 1. Использую получившийся шаблон разверните виртуальную машину.
 В данном руководстве мы используем 1 сервер для Rancher.
 Не забудьте указать правильный размер ресурсов, увеличить предоставляемый жесткий диск и т.д.
+При использовании шаблона и без cloud-init не произойдет изменение размеров раздела btrfs до размера всего диска, чтобы это сделать вручную, выполните команды ниже:
+```bash
+echo -e "quit\nY\n" | sfdisk /dev/sda --force
+partprobe /dev/sda
+echo 1 > /sys/block/sda/device/rescan
+parted -s /dev/sda resize 3 100%
+btrfs filesystem resize max /
+```
 2. Настройте на Вашем сервере сеть в соответствии с выбранным IP адресом и именем заданным при __получении render шаблона Rancher__.
 ```bash
 yast2 lan
