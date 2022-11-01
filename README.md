@@ -1,5 +1,6 @@
 # airgap-10.2022
 Материалы к вебинару установки SUSE Rancher Airgap
+[Презентация](SUSE_Rancher_airgap _Q4.pdf)
 ## Полезные ссылки
 - [Установка Rancher Air-Gap](https://docs.ranchermanager.rancher.io/pages-for-subheaders/air-gapped-helm-cli-install)
 - [Установка RKE2 Air-Gap](https://docs.rke2.io/install/airgap/)
