@@ -3,7 +3,7 @@
 <!-- OBS-Profiles: @BUILD_FLAVOR@ -->
 <!-- OBS-Milestone: %current_milestone -->
 
-<image schemaversion="6.1" name="SLES15-SP4-Minimal-RKE2" displayname="SLES 15 SP4">
+<image schemaversion="6.1" name="SLES15-SP4-Minimal-Rancher" displayname="SLES 15 SP4">
     <description type="system">
         <author>SUSE CIS</author>
         <contact>Pavel.Zhukov@suse.com</contact>
@@ -23,7 +23,7 @@
         <timezone>Europe/Moscow</timezone>
         <hwclock>utc</hwclock>
     <!-- END those settings are applied by suseConfig in config.sh -->
-     
+
         <rpm-excludedocs>true</rpm-excludedocs>
         <type
             image="vmx"
@@ -51,7 +51,7 @@
                 <volume name="usr/local"/>
                 <volume name="var" copy_on_write="false"/>
             </systemdisk>
-            <size unit="G">24</size>
+            <size unit="G">2</size>
             <machine memory="1024" HWversion="10" guestOS="sles-64"/>
         </type>
     </preferences>
@@ -59,7 +59,7 @@
   <users group="root">
       <user password="$1$suse$8xZqp834AVBxSB.CQ0IEf." home="/root" name="root"/>
   </users>
-    
+
     <repository alias="DVD-1-Product-SLES">
         <source path="file:///media/suse/Product-SLES"/>
     </repository>
@@ -74,6 +74,9 @@
     </repository>
     <repository alias="DVD-1-Module-Server-Applications">
         <source path="file:///media/suse/Module-Server-Applications"/>
+    </repository>
+    <repository alias="DVD-1-Module-Containers">
+        <source path="file:///media/suse/Module-Containers"/>
     </repository>
 
     <packages type="image">
@@ -106,7 +109,7 @@
         <package name="systemd-sysvinit"/>
         <package name="timezone"/>
         <package name="wicked"/>
-        <package name="iproute2"/> 
+        <package name="iproute2"/>
         <package name="openssh"/>
         <package name="rsync"/>
         <package name="salt-minion"/>
@@ -150,10 +153,13 @@
         <package name="nfs-client " />
         <package name="nfsidmap" />
         <package name="rpcbind" />
-        
+
       <!--Packages for demo stend-->
         <package name="yast2-network" />
         <package name="yast2-ntp-client" />
+      <!--Packages for RKE1-->
+        <package name="docker" />
+
     </packages>
 
     <packages type="bootstrap">
