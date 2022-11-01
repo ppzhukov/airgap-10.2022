@@ -541,10 +541,10 @@ kubectl -n cattle-system apply -R -f ./rancher
 
 _Результат: у Вас получится установить RKE2 (Kubernetes) и установить в него SUSE Rancher используя локальный Registry и без подключения к интернет_
 
-### Развертывание Kubernetes с помощью SUSE Rancher.
+### Развертывание Kubernetes (RKE2) с помощью SUSE Rancher.
 Для развертывания RKE2 с помощью установленного сервера SUSE Rancher сделайте следующее:
 - Зайдите на web интерфейс установленного SUSE Rancher используя адрес указанный при render шаблона Rancher.
-- Создайте RKE/RKE2 кластер используя web интерфейс.
+- Создайте RKE2 кластер используя web интерфейс.
 - Убедитесь, что при создании у Вас указана настройка Registry.
 - Ноды кластера должны доверять Вашему Registry, поэтому требуется добавить на новых узлах CA сертификата в доверенные, в данной демонстрации мы сделаем это с помощью cloud-init
 
@@ -566,5 +566,54 @@ runcmd:
   - systemctl restart chronyd
   - update-ca-certificates && c_rehash
 ```
+
+### Развертывание Kubernetes (RKE) с помощью SUSE Rancher.
+Для развертывания RKE версии 1 с помощью установленного сервера SUSE Rancher сделайте следующее:
+- Зайдите на web интерфейс установленного SUSE Rancher используя адрес указанный при render шаблона Rancher.
+- Создайте RKE кластер используя web интерфейс.
+- Ноды кластера должны доверять Вашему Registry, поэтому требуется добавить на новых узлах CA сертификата в доверенные, в данной демонстрации мы сделаем это с помощью cloud-init
+
+#### Cloud Init 
+В приведенном демо стенде мы используем cloud-init для настройки синхронизации времени (замените IP адрес, на адрес своего источника времени) и добавления CA в доверенные (Замените данными вашего CA - файл _/opt/certificates/cacert.pem_ на Jump Host):
+```
+#cloud-config
+write_files:
+  - path: /etc/pki/trust/anchors/rancher-stend.pem
+    content: |    
+        -----BEGIN CERTIFICATE-----
+        Данные Вашего сертификата.
+        Незабудьте про отступы в этом файле
+        -----END CERTIFICATE-----
+
+runcmd:
+  - path: /etc/sysctl.d/90-rancher.conf
+    content: |    
+        net.bridge.bridge-nf-call-iptables=1
+        net.ipv6.conf.all.disable_ipv6=1
+        net.ipv6.conf.default.disable_ipv6=1
+        net.ipv6.conf.lo.disable_ipv6=1  
+
+  - path: /etc/modules-load.d/modules-rancher.conf
+    content: |    
+        br_netfilter
+
+runcmd:
+  - swapoff -a
+  - systemctl disable kdump --now
+  - systemctl disable firewalld --now
+  - usermod -aG docker root
+  - chown root:docker /var/run/docker.sock
+  - modprobe br_netfilter
+  - sysctl net.bridge.bridge-nf-call-iptables=1
+  - sysctl net.ipv6.conf.all.disable_ipv6=1
+  - sysctl net.ipv6.conf.default.disable_ipv6=1
+  - sysctl net.ipv6.conf.lo.disable_ipv6=1     
+  - echo "pool 192.168.0.10 iburst" >> /etc/chrony.conf
+  - systemctl restart chronyd
+  - update-ca-certificates && c_rehash
+  - systemctl enable docker --now
+```
+
+
 
 [Файлы материалов](https://github.com/ppzhukov/airgap-10.2022/)
