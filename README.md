@@ -1,13 +1,10 @@
 # airgap-10.2022
 Материалы к вебинару установки SUSE Rancher Airgap
 ## Полезные ссылки
-[Установка Rancher Air-Gap](https://docs.ranchermanager.rancher.io/pages-for-subheaders/air-gapped-helm-cli-install)
-
-[Установка RKE2 Air-Gap](https://docs.rke2.io/install/airgap/)
-
-[Установка K3S Air-Gap](https://docs.k3s.io/installation/airgap)
-
-[Air Gap установка Rancher/RKE2 для запуска SAP Data Intelligence 3.1](https://github.com/dff1980/SAPDI-2022)
+- [Установка Rancher Air-Gap](https://docs.ranchermanager.rancher.io/pages-for-subheaders/air-gapped-helm-cli-install)
+- [Установка RKE2 Air-Gap](https://docs.rke2.io/install/airgap/)
+- [Установка K3S Air-Gap](https://docs.k3s.io/installation/airgap)
+- [Air Gap установка Rancher/RKE2 для запуска SAP Data Intelligence 3.1](https://github.com/dff1980/SAPDI-2022)
 ## Системные требования
 Для установки RKE/RKE2/K3S и Rancher в инфраструктуре с воздушным зазором нам потребуется:
 1. Выделенная машина с доступом в интернет, которая скачает все необходимые для установки данные.
