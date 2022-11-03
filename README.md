@@ -71,7 +71,7 @@ style d10 fill:#EEEEEE
   Поскольку мы совместили роли, нам понадобиться больше ресурсов для запуска реальной нагрузки.
 
 ### Используемые версии
-- SUSE RKE2 v1.24.6+rke2r1 (Версия Kubernetes 1.24 для SUSE Rancher v2.6.8
+- SUSE RKE2 v1.24.2+rke2r1 (Default версия Kubernetes 1.24 для SUSE Rancher v2.6.8)
 - SUSE Rancher v2.6.8
 - SUSE SLES 15 SP4
 - Helm v3.9.4 (Поддерживаемые версии Kubernetes 1.24.x - 1.21.x)
@@ -145,7 +145,7 @@ sort -u rancher-images.txt -o rancher-images.txt
 
   2. Добавьте образы RKE2 к файлу __rancher-images.txt__:
 ```bash
-wget https://github.com/rancher/rke2/releases/download/v1.24.6%2Brke2r1/rke2-images-all.linux-amd64.txt
+wget https://github.com/rancher/rke2/releases/download/v1.24.2%2Brke2r1/rke2-images-all.linux-amd64.txt
 sed -i 's/docker\.io\///' rke2-images-all.linux-amd64.txt
 cat rke2-images-all.linux-amd64.txt >> ./rancher-images.txt
 ```
@@ -209,7 +209,7 @@ helm template rancher ./rancher-2.6.8.tgz --output-dir . \
 11. Скачайте утилиты CLI 
 ```bash
 curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
-wget https://github.com/rancher/rke2/releases/download/v1.24.6%2Brke2r1/rke2.linux-amd64.tar.gz
+wget https://github.com/rancher/rke2/releases/download/v1.24.2%2Brke2r1/rke2.linux-amd64.tar.gz
 ```
 
 12. Получите образы registry
